@@ -16,11 +16,11 @@ public class MapUIManager : MonoBehaviour
     private bool hasLoggedInitialMapUI;
     private bool hasBuiltMapUI;
 
-    private Dictionary<MapNode, RectTransform> nodeUIMap;
+    private Dictionary<MapNode, RectTransform> nodeUIMap = new Dictionary<MapNode, RectTransform>();
+    
 
     private void Start()
     {
-        nodeUIMap = new Dictionary<MapNode, RectTransform>();
 
         if (runManager == null)
         {
@@ -55,6 +55,22 @@ public class MapUIManager : MonoBehaviour
         Debug.Log("MapUIManager Ready");
     }
 
+    public void SetRunManager(RunManager targetRunManager)
+    {
+        if (targetRunManager == null)
+        {
+            Debug.LogError("MapUIManager cannot set RunManager because it is null");
+            return;
+        }
+    
+        runManager = targetRunManager;
+    
+        Debug.Log(
+            "MapUIManager RunManager Set | CurrentRun : " +
+            (runManager.CurrentRun != null)
+        );
+    }
+
     public void RefreshMapUI()
     {
         if (!hasBuiltMapUI)
@@ -69,6 +85,36 @@ public class MapUIManager : MonoBehaviour
 
     private void BuildMapUI()
     {
+        if (runManager == null)
+        {
+            Debug.LogError("BuildMapUI: RunManager is null");
+            return;
+        }
+
+        if (mapNodePrefab == null)
+        {
+            Debug.LogError("BuildMapUI: Map Node Prefab is null");
+            return;
+        }
+
+        if (mapNodeContainer == null)
+        {
+            Debug.LogError("BuildMapUI: Map Node Container is null");
+            return;
+        }
+
+        if (mapLayerPrefab == null)
+        {
+            Debug.LogError("BuildMapUI: Map Layer Prefab is null");
+            return;
+        }
+
+        if (nodeUIMap == null)
+        {
+            nodeUIMap =
+                new Dictionary<MapNode, RectTransform>();
+        }
+
         ClearMapUI();
     
         IReadOnlyList<MapNode> allNodes =

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class RunManager : MonoBehaviour
 {
@@ -9,6 +10,31 @@ public class RunManager : MonoBehaviour
     [SerializeField] private MapManager mapManager;
     [SerializeField] private MapUIManager mapUIManager;
 
+    private static RunManager instance;
+
+    private void Awake()
+    {
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        instance = this;
+
+        DontDestroyOnLoad(gameObject);
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDestroy()
+    {
+        if (instance == this)
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
+    }
+    
     private void Start()
     {
         if (mapGenerator == null)
@@ -16,15 +42,15 @@ public class RunManager : MonoBehaviour
             Debug.LogError("MapGenerator is not assigned");
             return;
         }
-
+    
         if (mapManager == null)
         {
             Debug.LogError("MapManager is not assigned");
             return;
         }
-
+    
         mapGenerator.GenerateMap();
-
+    
         StartNewRun();
     }
 
@@ -47,6 +73,8 @@ public class RunManager : MonoBehaviour
             return;
         }
 
+        CurrentRun.SetMap(mapGenerator.CurrentMap);
+
         if (mapGenerator.CurrentMap.StartNode == null)
         {
             Debug.LogError("Start Node is null");
@@ -57,6 +85,9 @@ public class RunManager : MonoBehaviour
         mapManager.SetStartNode(mapGenerator.CurrentMap.StartNode);
 
         CurrentRun.StartRun();
+
+        Debug.Log("Run Active : " + IsRunActive());
+        Debug.Log("Map Current Node : " + mapManager.CurrentNode);
 
         Debug.Log("Run Start Node Set");
         Debug.Log("Has Run Started : " + CurrentRun.HasStarted);
@@ -156,33 +187,145 @@ public class RunManager : MonoBehaviour
 
         CurrentRun.SetCurrentNode(node);
 
+        Debug.Log(
+            "MOVE NODE : " +
+            node.NodeType +
+            " | Layer : " +
+            node.LayerIndex
+        );
+
+        Debug.Log(
+            "NEXT NODE COUNT : " +
+            node.Connections.Count
+        );
+
+        for (int i = 0; i < node.Connections.Count; i++)
+        {
+            Debug.Log(
+                "NEXT NODE " +
+                i +
+                " : " +
+                node.Connections[i].NodeType +
+                " | Layer : " +
+                node.Connections[i].LayerIndex
+            );
+        }
+
         Debug.Log("RunManager Moved To Node");
         Debug.Log("Current Node Type : " + CurrentRun.CurrentNode.NodeType);
 
-        if (IsCurrentNodeBoss())
-        {
-            CompleteRun();
-        }
+        HandleNodeSceneTransition();
     }
 
     public bool CanMoveToNode(MapNode node)
     {
+        Debug.Log(
+            "===== CanMoveToNode CHECK ====="
+        );
+
+        Debug.Log(
+            "CurrentRun : " +
+            (CurrentRun != null)
+        );
+
+        Debug.Log(
+            "MapManager : " +
+            (mapManager != null)
+        );
+
+        Debug.Log(
+            "Run Active : " +
+            IsRunActive()
+        );
+
         if (CurrentRun == null)
         {
+            Debug.Log(
+                "CanMoveToNode FALSE : CurrentRun is null"
+            );
+
             return false;
         }
 
         if (mapManager == null)
         {
+            Debug.Log(
+                "CanMoveToNode FALSE : MapManager is null"
+            );
+
             return false;
         }
 
         if (!IsRunActive())
         {
+            Debug.Log(
+                "CanMoveToNode FALSE : Run is not active"
+            );
+
+            Debug.Log(
+                "Current Run State : " +
+                CurrentRun.State
+            );
+
             return false;
         }
 
-        return mapManager.CanMoveToNode(node);
+        bool canMove =
+            mapManager.CanMoveToNode(node);
+
+        Debug.Log(
+            "MapManager CanMove : " +
+            canMove
+        );
+
+        Debug.Log(
+            "=============================="
+        );
+
+        return canMove;
+    }
+
+    private void HandleNodeSceneTransition()
+    {
+        if (CurrentRun == null)
+        {
+            return;
+        }
+
+        if (CurrentRun.CurrentNode == null)
+        {
+            return;
+        }
+
+        switch (CurrentRun.CurrentNode.NodeType)
+        {
+            case MapNodeType.NormalBattle:
+                SceneManager.LoadScene("BattleScene");
+                break;
+
+            case MapNodeType.Elite:
+                SceneManager.LoadScene("BattleScene");
+                break;
+
+            case MapNodeType.Boss:
+                SceneManager.LoadScene("BattleScene");
+                break;
+
+            case MapNodeType.Rest:
+                SceneManager.LoadScene("RestScene");
+                break;
+
+            case MapNodeType.Shop:
+                SceneManager.LoadScene("ShopScene");
+                break;
+
+            default:
+                Debug.LogWarning(
+                    "No Scene assigned for Node Type: "
+                    + CurrentRun.CurrentNode.NodeType
+                );
+                break;
+        }
     }
 
     public IReadOnlyList<MapNode> GetAvailableNodes()
@@ -275,5 +418,126 @@ public class RunManager : MonoBehaviour
         {
             mapUIManager.HideMapUI();
         }
+    }
+
+    private void OnSceneLoaded(
+        Scene scene,
+        LoadSceneMode mode)
+    {
+        Debug.Log(
+            "===== SCENE LOADED ===== " +
+            scene.name
+        );
+
+        Debug.Log(
+            "RunManager Instance : " +
+            (instance == this)
+        );
+
+        Debug.Log(
+            "CurrentRun Exists : " +
+            (CurrentRun != null)
+        );
+
+        if (CurrentRun != null)
+        {
+            Debug.Log(
+                "CurrentRun State : " +
+                CurrentRun.State
+            );
+
+            Debug.Log(
+                "CurrentRun Node : " +
+                (
+                    CurrentRun.CurrentNode != null
+                    ? CurrentRun.CurrentNode.NodeType.ToString()
+                    : "NULL"
+                )
+            );
+        }
+
+        if (scene.name != "MapScene")
+        {
+            return;
+        }
+
+        if (CurrentRun == null)
+        {
+            Debug.LogWarning(
+                "MapScene Loaded But CurrentRun is NULL"
+            );
+
+            return;
+        }
+
+        mapGenerator =
+            FindFirstObjectByType<MapGenerator>();
+
+        mapManager =
+            FindFirstObjectByType<MapManager>();
+
+        mapUIManager =
+            FindFirstObjectByType<MapUIManager>();
+
+        if (mapGenerator == null)
+        {
+            Debug.LogError("MapGenerator not found in MapScene");
+            return;
+        }
+
+        if (mapManager == null)
+        {
+            Debug.LogError("MapManager not found in MapScene");
+            return;
+        }
+
+        if (mapUIManager == null)
+        {
+            Debug.LogError("MapUIManager not found in MapScene");
+            return;
+        }
+
+        mapUIManager.SetRunManager(this);
+
+        if (CurrentRun.CurrentMap == null)
+        {
+            Debug.LogError("CurrentRun CurrentMap is null");
+            return;
+        }
+
+        if (CurrentRun.CurrentNode == null)
+        {
+            Debug.LogError("CurrentRun CurrentNode is null");
+            return;
+        }
+
+        mapGenerator.SetCurrentMap(
+            CurrentRun.CurrentMap
+        );
+
+        mapManager.SetCurrentNode(
+            CurrentRun.CurrentNode
+        );
+
+        mapUIManager.RefreshMapUI();
+    }
+
+    public void ReturnToMap()
+    {
+        if (CurrentRun == null)
+        {
+            Debug.LogError("Cannot return to Map because CurrentRun is null");
+            return;
+        }
+
+        if (!IsRunActive())
+        {
+            Debug.LogWarning("Cannot return to Map because Run is not active");
+            return;
+        }
+
+        Debug.Log("Returning To MapScene");
+
+        SceneManager.LoadScene("MapScene");
     }
 }

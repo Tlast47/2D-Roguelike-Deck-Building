@@ -15,6 +15,19 @@ public class MapNodeView : MonoBehaviour
         node = targetNode;
         runManager = targetRunManager;
 
+        Debug.Log(
+            "MapNodeView Setup | RunManager : " +
+            (runManager != null)
+        );
+        
+        Debug.Log(
+            "MapNodeView Setup | CurrentRun : " +
+            (
+                runManager != null &&
+                runManager.CurrentRun != null
+            )
+        );
+
         if (nodeButton == null)
         {
             Debug.LogError("MapNodeView Button is not assigned");
@@ -41,14 +54,24 @@ public class MapNodeView : MonoBehaviour
         {
             return;
         }
-
+    
         if (runManager == null || node == null)
         {
             nodeButton.interactable = false;
             return;
         }
-
-        nodeButton.interactable = runManager.CanMoveToNode(node);
+    
+        bool canMove =
+            runManager.CanMoveToNode(node);
+    
+        Debug.Log(
+            "MapNodeView : " +
+            node.NodeType +
+            " | CanMove : " +
+            canMove
+        );
+    
+        nodeButton.interactable = canMove;
     }
 
     private void OnNodeClicked()

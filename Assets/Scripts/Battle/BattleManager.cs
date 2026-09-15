@@ -239,8 +239,18 @@ public class BattleManager : MonoBehaviour
 
     private void HandlePlayerWin()
     {
-        Debug.Log("Player Wins!");
-        EndBattle();
+        Debug.Log("Player Win");
+
+        RunManager runManager =
+            FindFirstObjectByType<RunManager>();
+
+        if (runManager == null)
+        {
+            Debug.LogError("RunManager not found");
+            return;
+        }
+
+        runManager.ReturnToMap();
     }
 
     private void HandlePlayerLose()

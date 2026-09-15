@@ -57,17 +57,60 @@ public class MapManager : MonoBehaviour
 
     public bool CanMoveToNode(MapNode node)
     {
+        Debug.Log(
+            "===== MapManager CanMove ====="
+        );
+    
+        Debug.Log(
+            "Current Node : " +
+            (currentNode != null
+                ? currentNode.NodeType.ToString()
+                : "NULL")
+        );
+    
+        Debug.Log(
+            "Target Node : " +
+            (node != null
+                ? node.NodeType.ToString()
+                : "NULL")
+        );
+    
         if (currentNode == null)
         {
+            Debug.Log(
+                "FALSE : Current Node is null"
+            );
+    
             return false;
         }
-
+    
         if (node == null)
         {
+            Debug.Log(
+                "FALSE : Target Node is null"
+            );
+    
             return false;
         }
-
-        return AvailableNodes.Contains(node);
+    
+        bool connected =
+            AvailableNodes.Contains(node);
+    
+        Debug.Log(
+            "Available Node Count : " +
+            AvailableNodes.Count
+        );
+    
+        Debug.Log(
+            "Connected : " +
+            connected
+        );
+    
+        Debug.Log(
+            "============================="
+        );
+    
+        return connected;
     }
 
     public void SetStartNode(MapNode node)

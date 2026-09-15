@@ -13,6 +13,17 @@ public class MapGenerator : MonoBehaviour
 
     private const int MaxRestCount = 2;
     private const int MaxEliteCount = 2;
+
+    public void SetCurrentMap(MapData map)
+    {
+        if (map == null)
+        {
+            Debug.LogError("Cannot set Current Map because map is null");
+            return;
+        }
+    
+        CurrentMap = map;
+    }
     
     public void GenerateMap()
     {

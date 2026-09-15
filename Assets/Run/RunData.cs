@@ -2,6 +2,8 @@ public class RunData
 {
     public int Gold { get; private set; }
 
+    public MapData CurrentMap { get; private set; }
+
     public MapNode CurrentNode { get; private set; }
 
     public bool HasStarted => CurrentNode != null;
@@ -11,8 +13,19 @@ public class RunData
     public RunData()
     {
         Gold = 0;
+        CurrentMap = null;
         CurrentNode = null;
         State = RunState.NotStarted;
+    }
+
+    public void SetMap(MapData map)
+    {
+        if (map == null)
+        {
+            return;
+        }
+
+        CurrentMap = map;
     }
 
     public void SetCurrentNode(MapNode node)
@@ -29,7 +42,7 @@ public class RunData
     {
         State = RunState.Playing;
     }
-    
+
     public void CompleteRun()
     {
         State = RunState.Completed;
