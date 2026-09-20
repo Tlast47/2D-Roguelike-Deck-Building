@@ -57,6 +57,7 @@ public class MapManager : MonoBehaviour
 
     public bool CanMoveToNode(MapNode node)
     {
+        /*
         Debug.Log(
             "===== MapManager CanMove ====="
         );
@@ -74,6 +75,7 @@ public class MapManager : MonoBehaviour
                 ? node.NodeType.ToString()
                 : "NULL")
         );
+        */
     
         if (currentNode == null)
         {
@@ -96,6 +98,7 @@ public class MapManager : MonoBehaviour
         bool connected =
             AvailableNodes.Contains(node);
     
+        /*
         Debug.Log(
             "Available Node Count : " +
             AvailableNodes.Count
@@ -109,6 +112,7 @@ public class MapManager : MonoBehaviour
         Debug.Log(
             "============================="
         );
+        */
     
         return connected;
     }
@@ -123,8 +127,10 @@ public class MapManager : MonoBehaviour
 
         currentNode = node;
 
+        /*
         Debug.Log("MapManager Start Node Set");
         Debug.Log("Map Current Node Type : " + currentNode.NodeType);
+        */
     }
 
     public void LogAvailableNodes()
@@ -135,6 +141,7 @@ public class MapManager : MonoBehaviour
             return;
         }
     
+        /*
         Debug.Log("Available Node Count : " + AvailableNodes.Count);
     
         for (int i = 0; i < AvailableNodes.Count; i++)
@@ -144,6 +151,7 @@ public class MapManager : MonoBehaviour
                 " : " + AvailableNodes[i].NodeType
             );
         }
+        */
     }
     
 }

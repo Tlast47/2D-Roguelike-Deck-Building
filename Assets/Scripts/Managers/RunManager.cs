@@ -6,9 +6,14 @@ public class RunManager : MonoBehaviour
 {
     public RunData CurrentRun { get; private set; }
 
+    [Header("Map")]
     [SerializeField] private MapGenerator mapGenerator;
     [SerializeField] private MapManager mapManager;
     [SerializeField] private MapUIManager mapUIManager;
+
+    [Header("Starter Deck")]
+    [SerializeField] private CardData strikeCard;
+    [SerializeField] private CardData defendCard;
 
     private static RunManager instance;
 
@@ -58,6 +63,10 @@ public class RunManager : MonoBehaviour
     {
         CurrentRun = new RunData();
 
+        CurrentRun.AddGold(100);
+
+        InitializeStarterDeck();
+
         Debug.Log("New Run Started");
         Debug.Log("Starting Gold : " + CurrentRun.Gold);
 
@@ -86,6 +95,7 @@ public class RunManager : MonoBehaviour
 
         CurrentRun.StartRun();
 
+        /*
         Debug.Log("Run Active : " + IsRunActive());
         Debug.Log("Map Current Node : " + mapManager.CurrentNode);
 
@@ -95,7 +105,8 @@ public class RunManager : MonoBehaviour
         Debug.Log("Run State : " + CurrentRun.State);
         Debug.Log("Is Run Active : " + IsRunActive());
         Debug.Log("Map and Run Synchronized : " + IsMapAndRunNodeSynchronized());
-        
+        */
+
         mapManager.LogAvailableNodes();
 
         if (mapUIManager != null)
@@ -106,6 +117,27 @@ public class RunManager : MonoBehaviour
         {
             Debug.LogError("MapUIManager is not assigned");
         }
+    }
+
+    private void InitializeStarterDeck()
+    {
+        if (strikeCard == null || defendCard == null)
+        {
+            Debug.LogError("Starter Deck CardData is missing");
+            return;
+        }
+
+        for (int i = 0; i < 5; i++)
+        {
+            CurrentRun.Deck.AddCard(strikeCard);
+        }
+
+        for (int i = 0; i < 5; i++)
+        {
+            CurrentRun.Deck.AddCard(defendCard);
+        }
+
+        Debug.Log("Starter Deck Initialized : " + CurrentRun.Deck.Count + " cards");
     }
     
     public void AddGold(int amount)
@@ -219,6 +251,7 @@ public class RunManager : MonoBehaviour
 
     public bool CanMoveToNode(MapNode node)
     {
+        /*
         Debug.Log(
             "===== CanMoveToNode CHECK ====="
         );
@@ -236,7 +269,8 @@ public class RunManager : MonoBehaviour
         Debug.Log(
             "Run Active : " +
             IsRunActive()
-        );
+        )
+        */
 
         if (CurrentRun == null)
         {
@@ -273,6 +307,7 @@ public class RunManager : MonoBehaviour
         bool canMove =
             mapManager.CanMoveToNode(node);
 
+        /*
         Debug.Log(
             "MapManager CanMove : " +
             canMove
@@ -281,6 +316,7 @@ public class RunManager : MonoBehaviour
         Debug.Log(
             "=============================="
         );
+        */
 
         return canMove;
     }
@@ -424,6 +460,7 @@ public class RunManager : MonoBehaviour
         Scene scene,
         LoadSceneMode mode)
     {
+        /*
         Debug.Log(
             "===== SCENE LOADED ===== " +
             scene.name
@@ -438,6 +475,7 @@ public class RunManager : MonoBehaviour
             "CurrentRun Exists : " +
             (CurrentRun != null)
         );
+        */
 
         if (CurrentRun != null)
         {

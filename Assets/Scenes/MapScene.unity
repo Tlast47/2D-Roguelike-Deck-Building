@@ -667,6 +667,8 @@ MonoBehaviour:
   mapGenerator: {fileID: 533545919}
   mapManager: {fileID: 1804455084}
   mapUIManager: {fileID: 994743765}
+  strikeCard: {fileID: 11400000, guid: 123cc5bdd2b51814a84e20e1dabffc86, type: 2}
+  defendCard: {fileID: 11400000, guid: 1fce8215a5070e048b33d648fdf6d6b8, type: 2}
 --- !u!4 &1892064329
 Transform:
   m_ObjectHideFlags: 0

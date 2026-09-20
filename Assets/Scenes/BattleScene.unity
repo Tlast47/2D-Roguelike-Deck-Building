@@ -343,7 +343,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 613968151}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
@@ -635,7 +635,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 864683710}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a9c288c152486d40ab76f7fd82118e9, type: 3}
+  m_Script: {fileID: 11500000, guid: a7d8ec549da817846a2c09a22006a43b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleManager
   player: {fileID: 638605477}
@@ -645,7 +645,7 @@ MonoBehaviour:
   cardEffectManager: {fileID: 750736505}
   enemyIntentDisplayManager: {fileID: 1831372312}
   enemyManager: {fileID: 820921870}
-  selectedCard: {fileID: 11400000, guid: 123cc5bdd2b51814a84e20e1dabffc86, type: 2}
+  selectedCard: {fileID: 0}
 --- !u!1 &984752689
 GameObject:
   m_ObjectHideFlags: 0
@@ -1033,7 +1033,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1783348845}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 

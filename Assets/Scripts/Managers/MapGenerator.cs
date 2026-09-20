@@ -35,8 +35,9 @@ public class MapGenerator : MonoBehaviour
         CreateStartAndBoss();
 
         List<MapNode> firstLayer = CreateRandomLayer(3, 1);
-        //List<MapNode> secondLayer = CreateRandomLayer(2, 2);
+        List<MapNode> secondLayer = CreateRandomLayer(2, 2);
 
+        /*
         List<MapNode> secondLayer = new List<MapNode>();
         for (int i = 0; i < 2; i++)
         {
@@ -46,7 +47,7 @@ public class MapGenerator : MonoBehaviour
 
             secondLayer.Add(node);
             CurrentMap.AddNode(node);
-        }
+        }*/
 
         startNode.AddConnection(firstLayer[0]);
         startNode.AddConnection(firstLayer[1]);
@@ -65,12 +66,14 @@ public class MapGenerator : MonoBehaviour
         AddNodesToMapData(CurrentMap, secondLayer);
         CurrentMap.AddNode(bossNode);
 
+        /*
         Debug.Log("Start Available Nodes : " + startNode.Connections.Count);
         Debug.Log("First Layer Count : " + firstLayer.Count);
         Debug.Log("Second Layer Count : " + secondLayer.Count);
         Debug.Log("Map Node Count : " + CurrentMap.Nodes.Count);
 
         Debug.Log("Start Node Type : " + startNode.NodeType);
+        */
 
         if (ValidateMap())
         {
@@ -81,6 +84,7 @@ public class MapGenerator : MonoBehaviour
             Debug.LogError("Map Validation Failed");
         }
 
+        /*
         Debug.Log("Start Layer : " + startNode.LayerIndex);
 
         for (int i = 0; i < firstLayer.Count; i++)
@@ -102,6 +106,7 @@ public class MapGenerator : MonoBehaviour
         }
 
         Debug.Log("Boss Layer : " + bossNode.LayerIndex);
+        */
         
         TestMapConnections();
     }
@@ -118,23 +123,27 @@ public class MapGenerator : MonoBehaviour
         {
             MapNode node = CurrentMap.Nodes[i];
     
+            /*
             Debug.Log(
                 "Node Layer " + node.LayerIndex +
                 " Type " + node.NodeType +
                 " Connections : " + node.Connections.Count
             );
+            */
     
             for (int j = 0; j < node.Connections.Count; j++)
             {
                 MapNode connectedNode =
                     node.Connections[j];
-    
+
+                /*
                 Debug.Log(
                     "    -> Layer " +
                     connectedNode.LayerIndex +
                     " Type " +
                     connectedNode.NodeType
                 );
+                */
             }
         }
     }
@@ -170,29 +179,35 @@ public class MapGenerator : MonoBehaviour
 
     private MapNodeType GetRandomMiddleNodeType()
     {
-        int randomValue = Random.Range(0, 3);
-
+        int randomValue = Random.Range(0, 4);
+    
         switch (randomValue)
         {
             case 0:
                 return MapNodeType.NormalBattle;
-
+    
             case 1:
                 if (eliteCount < MaxEliteCount)
                 {
                     eliteCount++;
                     return MapNodeType.Elite;
                 }
-
+    
                 return MapNodeType.NormalBattle;
-
-            default:
+    
+            case 2:
                 if (restCount < MaxRestCount)
                 {
                     restCount++;
                     return MapNodeType.Rest;
                 }
-
+    
+                return MapNodeType.NormalBattle;
+    
+            case 3:
+                return MapNodeType.Shop;
+    
+            default:
                 return MapNodeType.NormalBattle;
         }
     }

@@ -15,6 +15,7 @@ public class MapNodeView : MonoBehaviour
         node = targetNode;
         runManager = targetRunManager;
 
+        /*
         Debug.Log(
             "MapNodeView Setup | RunManager : " +
             (runManager != null)
@@ -27,6 +28,7 @@ public class MapNodeView : MonoBehaviour
                 runManager.CurrentRun != null
             )
         );
+        */
 
         if (nodeButton == null)
         {
@@ -63,13 +65,16 @@ public class MapNodeView : MonoBehaviour
     
         bool canMove =
             runManager.CanMoveToNode(node);
-    
+
+
+        /*
         Debug.Log(
             "MapNodeView : " +
             node.NodeType +
             " | CanMove : " +
             canMove
         );
+        */
     
         nodeButton.interactable = canMove;
     }
