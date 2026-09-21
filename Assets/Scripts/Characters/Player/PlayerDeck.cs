@@ -33,4 +33,38 @@ public class PlayerDeck
 
         return cards.Contains(card);
     }
+
+    public bool UpgradeCard(int index)
+    {
+        if (index < 0 || index >= cards.Count)
+        {
+            return false;
+        }
+
+        CardData currentCard = cards[index];
+
+        if (currentCard == null)
+        {
+            return false;
+        }
+
+        if (currentCard.UpgradedCard == null)
+        {
+            return false;
+        }
+
+        cards[index] = currentCard.UpgradedCard;
+
+        return true;
+    }
+
+    public CardData GetCard(int index)
+    {
+        if (index < 0 || index >= cards.Count)
+        {
+            return null;
+        }
+    
+        return cards[index];
+    }
 }

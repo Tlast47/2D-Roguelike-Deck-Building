@@ -15,10 +15,12 @@ public class CardData : ScriptableObject
     [Header("Card Stats")]
     [SerializeField] private int energyCost;
     
-
     [Header("Card Effects")]
 
     [SerializeField] private List<CardEffect> effects;
+
+    [Header("Upgrade")]
+    [SerializeField] private CardData upgradedCard;
 
     public string CardName => cardName;
     public string Description => description;
@@ -29,5 +31,7 @@ public class CardData : ScriptableObject
     public int EnergyCost => energyCost;
 
     public List<CardEffect> Effects => effects;
+
+    public CardData UpgradedCard => upgradedCard;
 
 }

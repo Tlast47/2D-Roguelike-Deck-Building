@@ -12,6 +12,7 @@ public class RunData
 
     public PlayerDeck Deck { get; private set; }
 
+    public PlayerRunData Player { get; private set; }
 
     public RunData()
     {
@@ -21,6 +22,7 @@ public class RunData
         CurrentMap = null;
 
         Deck = new PlayerDeck();
+        Player = new PlayerRunData();
     }
 
 

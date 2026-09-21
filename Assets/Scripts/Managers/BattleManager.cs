@@ -56,6 +56,8 @@ public class BattleManager : MonoBehaviour
 
         Debug.Log("Battle Started");
 
+        LoadPlayerRunData();
+
         deckManager.StartBattleSetup();
 
         cardDisplayManager.RefreshHand();
@@ -111,6 +113,94 @@ public class BattleManager : MonoBehaviour
     private void SetupUI()
     {
 
+    }
+
+    private void LoadPlayerRunData()
+    {
+        RunManager runManager =
+            FindFirstObjectByType<RunManager>();
+
+        if (runManager == null)
+        {
+            Debug.LogError("BattleManager : RunManager not found");
+            return;
+        }
+
+        if (runManager.CurrentRun == null)
+        {
+            Debug.LogError("BattleManager : CurrentRun is null");
+            return;
+        }
+
+        if (runManager.CurrentRun.Player == null)
+        {
+            Debug.LogError("BattleManager : PlayerRunData is null");
+            return;
+        }
+
+        if (player == null)
+        {
+            Debug.LogError("BattleManager : PlayerData is null");
+            return;
+        }
+
+        int maxHP =
+            runManager.CurrentRun.Player.MaxHP;
+
+        int currentHP =
+            runManager.CurrentRun.Player.CurrentHP;
+
+        player.SetMaxHP(maxHP);
+        player.SetCurrentHP(currentHP);
+
+        Debug.Log(
+            "Player HP Loaded : " +
+            player.GetCurrentHP() +
+            " / " +
+            player.GetMaxHP()
+        );
+    }
+
+    private void SavePlayerRunData()
+    {
+        RunManager runManager =
+            FindFirstObjectByType<RunManager>();
+
+        if (runManager == null)
+        {
+            Debug.LogError("BattleManager : RunManager not found");
+            return;
+        }
+
+        if (runManager.CurrentRun == null)
+        {
+            Debug.LogError("BattleManager : CurrentRun is null");
+            return;
+        }
+
+        if (runManager.CurrentRun.Player == null)
+        {
+            Debug.LogError("BattleManager : PlayerRunData is null");
+            return;
+        }
+
+        if (player == null)
+        {
+            Debug.LogError("BattleManager : PlayerData is null");
+            return;
+        }
+
+        int currentHP =
+            player.GetCurrentHP();
+
+        runManager.CurrentRun.Player.SetCurrentHP(currentHP);
+
+        Debug.Log(
+            "Player HP Saved : " +
+            runManager.CurrentRun.Player.CurrentHP +
+            " / " +
+            runManager.CurrentRun.Player.MaxHP
+        );
     }
 
     public void SelectCard(CardData card)
@@ -240,16 +330,18 @@ public class BattleManager : MonoBehaviour
     private void HandlePlayerWin()
     {
         Debug.Log("Player Win");
-
+    
+        SavePlayerRunData();
+    
         RunManager runManager =
             FindFirstObjectByType<RunManager>();
-
+    
         if (runManager == null)
         {
             Debug.LogError("RunManager not found");
             return;
         }
-
+    
         runManager.ReturnToMap();
     }
 

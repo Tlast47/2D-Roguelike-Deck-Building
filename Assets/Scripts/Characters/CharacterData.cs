@@ -80,15 +80,41 @@ public class CharacterData : MonoBehaviour
 
     /////Getter/////
 
-    // Read-only access for UI
     public int GetCurrentHP()
     {
         return currentHP;
     }
 
+    public int GetMaxHP()
+    {
+        return maxHP;
+    }
+
     public int GetBlock()
     {
         return block;
+    }
+
+    /////Setter/////
+ 
+    public void SetMaxHP(int hp)
+    {
+        if (hp <= 0)
+        {
+            return;
+        }
+
+        maxHP = hp;
+
+        if (currentHP > maxHP)
+        {
+            currentHP = maxHP;
+        }
+    }
+
+    public void SetCurrentHP(int hp)
+    {
+        currentHP = Mathf.Clamp(hp, 0, maxHP);
     }
 
     /////State/////

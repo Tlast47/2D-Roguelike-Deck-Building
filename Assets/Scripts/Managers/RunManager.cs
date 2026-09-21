@@ -63,6 +63,13 @@ public class RunManager : MonoBehaviour
     {
         CurrentRun = new RunData();
 
+        Debug.Log(
+            "Player Run Data Created | HP : " +
+            CurrentRun.Player.CurrentHP +
+            " / " +
+            CurrentRun.Player.MaxHP
+        );
+
         CurrentRun.AddGold(100);
 
         InitializeStarterDeck();

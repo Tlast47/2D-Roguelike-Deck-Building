@@ -19,3 +19,4 @@ MonoBehaviour:
   energyCost: 1
   effects:
   - {fileID: 11400000, guid: 3c049a72ce0bf9a4dae440996e5dffff, type: 2}
+  upgradedCard: {fileID: 11400000, guid: e7ce1a68cb851934dad228c98f190b46, type: 2}
