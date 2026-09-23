@@ -342,7 +342,7 @@ public class BattleManager : MonoBehaviour
             return;
         }
     
-        runManager.ReturnToMap();
+        runManager.GoToReward();
     }
 
     private void HandlePlayerLose()

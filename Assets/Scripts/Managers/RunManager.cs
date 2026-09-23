@@ -567,6 +567,20 @@ public class RunManager : MonoBehaviour
         mapUIManager.RefreshMapUI();
     }
 
+    public void GoToReward()
+    {
+        if (!IsRunActive())
+        {
+            Debug.LogWarning(
+                "Cannot go to Reward because Run is not active"
+            );
+    
+            return;
+        }
+    
+        SceneManager.LoadScene("RewardScene");
+    }
+
     public void ReturnToMap()
     {
         if (CurrentRun == null)
