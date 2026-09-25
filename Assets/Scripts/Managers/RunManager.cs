@@ -599,4 +599,5 @@ public class RunManager : MonoBehaviour
 
         SceneManager.LoadScene("MapScene");
     }
+
 }

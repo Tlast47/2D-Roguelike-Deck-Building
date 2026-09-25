@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -5,30 +6,26 @@ public class BattleManager : MonoBehaviour
 {
     [Header("Character")]
     [SerializeField] private PlayerData player;
-    [SerializeField] private EnemyData enemy;
 
     [Header("Manager")]
     [SerializeField] private DeckManager deckManager;
     [SerializeField] private CardDisplayManager cardDisplayManager;
     [SerializeField] private CardEffectManager cardEffectManager;
-    [SerializeField] private EnemyIntentDisplayManager enemyIntentDisplayManager;
     [SerializeField] private EnemyManager enemyManager;
+    [SerializeField] private BattleEncounterManager battleEncounterManager;
+    [SerializeField] private BattleTargetManager battleTargetManager;
+    [SerializeField] private EnemyTargetDisplayManager enemyTargetDisplayManager;
 
     [Header("Battle State")]
-    //test
     [SerializeField] private CardData selectedCard;
-    //
 
     private BattleState currentState;
-
-    /////Battle Flow/////
 
     private void Start()
     {
         StartBattle();
     }
 
-    //test
     private void Update()
     {
         if (currentState != BattleState.PlayerTurn)
@@ -36,19 +33,35 @@ public class BattleManager : MonoBehaviour
             return;
         }
 
+        if (Keyboard.current == null)
+        {
+            return;
+        }
+
         if (Keyboard.current.spaceKey.wasPressedThisFrame)
         {
-            Debug.Log("SPACE PRESSED");
             PlaySelectedCard();
         }
 
         if (Keyboard.current.eKey.wasPressedThisFrame)
         {
-            Debug.Log("E PRESSED");
             EndPlayerTurn();
         }
     }
-    //
+
+    private void Awake()
+    {
+        if (battleTargetManager == null)
+        {
+            Debug.LogError(
+                "BattleManager : BattleTargetManager is null"
+            );
+
+            return;
+        }
+
+        battleTargetManager.OnEnemySelected += HandleEnemySelected;
+    }
 
     private void StartBattle()
     {
@@ -58,16 +71,122 @@ public class BattleManager : MonoBehaviour
 
         LoadPlayerRunData();
 
-        deckManager.StartBattleSetup();
+        if (!ValidateManagers())
+        {
+            return;
+        }
 
+        List<EnemyData> spawnedEnemies =
+            battleEncounterManager.SpawnEnemies();
+
+        if (spawnedEnemies == null ||
+            spawnedEnemies.Count == 0)
+        {
+            Debug.LogError(
+                "BattleManager : Failed to Spawn Enemies"
+            );
+
+            return;
+        }
+
+        enemyManager.SetEnemies(spawnedEnemies);
+        enemyManager.SetPlayer(player);
+
+        Debug.Log(
+            "BattleManager : Total Enemies = " +
+            enemyManager.Enemies.Count
+        );
+
+        deckManager.StartBattleSetup();
         cardDisplayManager.RefreshHand();
 
-        PrepareEnemyIntent();
+        enemyTargetDisplayManager.RefreshTargets(
+            enemyManager.Enemies
+        );
+
+        PrepareEnemyActions();
 
         StartPlayerTurn();
     }
 
-    /////Player/////
+    private bool ValidateManagers()
+    {
+        if (player == null)
+        {
+            Debug.LogError(
+                "BattleManager : PlayerData is null"
+            );
+
+            return false;
+        }
+
+        if (deckManager == null)
+        {
+            Debug.LogError(
+                "BattleManager : DeckManager is null"
+            );
+
+            return false;
+        }
+
+        if (cardDisplayManager == null)
+        {
+            Debug.LogError(
+                "BattleManager : CardDisplayManager is null"
+            );
+
+            return false;
+        }
+
+        if (cardEffectManager == null)
+        {
+            Debug.LogError(
+                "BattleManager : CardEffectManager is null"
+            );
+
+            return false;
+        }
+
+        if (enemyManager == null)
+        {
+            Debug.LogError(
+                "BattleManager : EnemyManager is null"
+            );
+
+            return false;
+        }
+
+        if (battleEncounterManager == null)
+        {
+            Debug.LogError(
+                "BattleManager : BattleEncounterManager is null"
+            );
+
+            return false;
+        }
+
+        if (battleTargetManager == null)
+        {
+            Debug.LogError(
+                "BattleManager : BattleTargetManager is null"
+            );
+
+            return false;
+        }
+
+        if (enemyTargetDisplayManager == null)
+        {
+            Debug.LogError(
+                "BattleManager : EnemyTargetDisplayManager is null"
+            );
+
+            return false;
+        }
+
+        return true;
+    }
+
+    ///// Player Turn /////
 
     private void StartPlayerTurn()
     {
@@ -75,22 +194,22 @@ public class BattleManager : MonoBehaviour
 
         currentState = BattleState.PlayerTurn;
 
+        selectedCard = null;
+
+        battleTargetManager.EndTargetSelection();
+
+        battleTargetManager.ClearTarget();
+
+        enemyTargetDisplayManager.SetTargetSelectionEnabled(false);
+
         Debug.Log("Player Turn Started");
-
-        //test
-        //PlaySelectedCard();
-        //Debug.Log("Energy : "+ player.CurrentEnergy);
-
     }
 
     private void SetupPlayerTurn()
     {
         SetupResources();
-
         SetupCards();
-
         SetupEffects();
-
         SetupUI();
     }
 
@@ -98,22 +217,360 @@ public class BattleManager : MonoBehaviour
     {
         player.ResetEnergy();
         player.ResetBlock();
+
+        enemyManager.ResetEnemyBlocks();
     }
 
     private void SetupCards()
     {
         deckManager.StartPlayerTurnDraw();
+        cardDisplayManager.RefreshHand();
     }
 
     private void SetupEffects()
     {
-
     }
 
     private void SetupUI()
     {
-
+        enemyTargetDisplayManager.RefreshTargets(
+            enemyManager.Enemies
+        );
     }
+
+    ///// Player Card /////
+
+    public void SelectCard(CardData card)
+    {
+        if (currentState != BattleState.PlayerTurn)
+        {
+            return;
+        }
+
+        if (card == null)
+        {
+            return;
+        }
+
+        selectedCard = card;
+
+        battleTargetManager.EndTargetSelection();
+
+        battleTargetManager.ClearTarget();
+
+        if (RequiresEnemyTarget(card))
+        {
+            battleTargetManager.BeginTargetSelection();
+            
+            enemyTargetDisplayManager.SetTargetSelectionEnabled(true);
+
+            Debug.Log(
+                "BattleManager : Waiting for Enemy Target"
+            );
+
+            return;
+        }
+
+        battleTargetManager.EndTargetSelection();
+
+        enemyTargetDisplayManager.SetTargetSelectionEnabled(false);
+
+        PlaySelectedCard();
+    }
+
+    private bool RequiresEnemyTarget(CardData card)
+    {
+        if (card == null ||
+            card.Effects == null)
+        {
+            return false;
+        }
+
+        foreach (CardEffect effect in card.Effects)
+        {
+            if (effect == null)
+            {
+                continue;
+            }
+
+            if (effect.Target == TargetType.SingleEnemy)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void PlaySelectedCard()
+    {
+        if (currentState != BattleState.PlayerTurn)
+        {
+            return;
+        }
+
+        if (selectedCard == null)
+        {
+            Debug.Log(
+                "BattleManager : No Card Selected"
+            );
+
+            return;
+        }
+
+        if (!deckManager.CanPlayCard(selectedCard))
+        {
+            Debug.Log(
+                "BattleManager : Card is not in Hand"
+            );
+
+            return;
+        }
+
+        EnemyData targetEnemy =
+            battleTargetManager.SelectedEnemy;
+
+        if (RequiresEnemyTarget(selectedCard))
+        {
+            if (targetEnemy == null)
+            {
+                Debug.Log(
+                    "BattleManager : No Enemy Target Selected"
+                );
+
+                return;
+            }
+
+            if (targetEnemy.IsDead())
+            {
+                battleTargetManager.ClearTarget();
+
+                enemyTargetDisplayManager.RefreshTargets(
+                    enemyManager.Enemies
+                );
+
+                return;
+            }
+        }
+
+        int cost =
+            selectedCard.EnergyCost;
+
+        if (!player.TryUseEnergy(cost))
+        {
+            Debug.Log(
+                "BattleManager : Not Enough Energy"
+            );
+
+            return;
+        }
+
+        cardEffectManager.Resolve(
+            selectedCard,
+            player,
+            enemyManager.Enemies,
+            targetEnemy
+        );
+
+        deckManager.PlayCard(selectedCard);
+
+        Debug.Log(
+            "Card Played : " +
+            selectedCard.CardName
+        );
+
+        selectedCard = null;
+
+        battleTargetManager.ClearTarget();
+
+        enemyTargetDisplayManager.SetTargetSelectionEnabled(false);
+
+        cardDisplayManager.RefreshHand();
+
+        ProcessBattleEnd();
+
+        if (currentState == BattleState.End)
+        {
+            return;
+        }
+
+        enemyTargetDisplayManager.RefreshTargets(
+            enemyManager.Enemies
+        );
+    }
+
+    ///// Player Turn End /////
+
+    public void EndPlayerTurn()
+    {
+        if (currentState != BattleState.PlayerTurn)
+        {
+            return;
+        }
+
+        selectedCard = null;
+
+        battleTargetManager.EndTargetSelection();
+
+        battleTargetManager.ClearTarget();
+
+        enemyTargetDisplayManager.SetTargetSelectionEnabled(false);
+
+        deckManager.DiscardHand();
+
+        cardDisplayManager.RefreshHand();
+
+        currentState = BattleState.EnemyTurn;
+
+        Debug.Log("Player Turn Ended");
+
+        StartEnemyTurn();
+    }
+
+    ///// Enemy Turn /////
+
+    private void StartEnemyTurn()
+    {
+        currentState = BattleState.EnemyTurn;
+
+        Debug.Log("Enemy Turn Started");
+
+        enemyManager.PerformTurn();
+
+        ProcessBattleEnd();
+
+        if (currentState == BattleState.End)
+        {
+            return;
+        }
+
+        PrepareEnemyActions();
+
+        EndEnemyTurn();
+    }
+
+    private void PrepareEnemyActions()
+    {
+        enemyManager.DecideActions();
+    }
+
+    private void EndEnemyTurn()
+    {
+        Debug.Log("Enemy Turn Ended");
+
+        StartPlayerTurn();
+    }
+
+    ///// Enemy /////
+  
+    private void OnDestroy()
+    {
+        if (battleTargetManager != null)
+        {
+            battleTargetManager.OnEnemySelected -= HandleEnemySelected;
+        }
+    }
+    
+    private void HandleEnemySelected(EnemyData enemy)
+    {
+        if (enemy == null)
+        {
+            return;
+        }
+    
+        if (currentState != BattleState.PlayerTurn)
+        {
+            return;
+        }
+    
+        if (selectedCard == null)
+        {
+            return;
+        }
+    
+        Debug.Log(
+            "BattleManager : Enemy Target Received : " +
+            enemy.name
+        );
+    
+        PlaySelectedCard();
+    }
+
+    ///// Battle Result /////
+
+    private void ProcessBattleEnd()
+    {
+        if (player.IsDead())
+        {
+            HandlePlayerLose();
+            return;
+        }
+
+        if (AreAllEnemiesDead())
+        {
+            HandlePlayerWin();
+            return;
+        }
+    }
+
+    private bool AreAllEnemiesDead()
+    {
+        if (enemyManager == null ||
+            enemyManager.Enemies == null ||
+            enemyManager.Enemies.Count == 0)
+        {
+            return false;
+        }
+
+        foreach (EnemyData enemy in enemyManager.Enemies)
+        {
+            if (enemy == null)
+            {
+                continue;
+            }
+
+            if (!enemy.IsDead())
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void HandlePlayerWin()
+    {
+        Debug.Log("Player Win");
+
+        SavePlayerRunData();
+
+        RunManager runManager =
+            FindFirstObjectByType<RunManager>();
+
+        if (runManager == null)
+        {
+            Debug.LogError("RunManager not found");
+            return;
+        }
+
+        runManager.GoToReward();
+    }
+
+    private void HandlePlayerLose()
+    {
+        Debug.Log("Player Loses!");
+
+        EndBattle();
+    }
+
+    private void EndBattle()
+    {
+        currentState = BattleState.End;
+
+        Debug.Log("Battle Ended");
+    }
+
+    ///// Player Run Data /////
 
     private void LoadPlayerRunData()
     {
@@ -122,36 +579,47 @@ public class BattleManager : MonoBehaviour
 
         if (runManager == null)
         {
-            Debug.LogError("BattleManager : RunManager not found");
+            Debug.LogError(
+                "BattleManager : RunManager not found"
+            );
+
             return;
         }
 
         if (runManager.CurrentRun == null)
         {
-            Debug.LogError("BattleManager : CurrentRun is null");
+            Debug.LogError(
+                "BattleManager : CurrentRun is null"
+            );
+
             return;
         }
 
         if (runManager.CurrentRun.Player == null)
         {
-            Debug.LogError("BattleManager : PlayerRunData is null");
+            Debug.LogError(
+                "BattleManager : PlayerRunData is null"
+            );
+
             return;
         }
 
         if (player == null)
         {
-            Debug.LogError("BattleManager : PlayerData is null");
+            Debug.LogError(
+                "BattleManager : PlayerData is null"
+            );
+
             return;
         }
 
-        int maxHP =
-            runManager.CurrentRun.Player.MaxHP;
+        player.SetMaxHP(
+            runManager.CurrentRun.Player.MaxHP
+        );
 
-        int currentHP =
-            runManager.CurrentRun.Player.CurrentHP;
-
-        player.SetMaxHP(maxHP);
-        player.SetCurrentHP(currentHP);
+        player.SetCurrentHP(
+            runManager.CurrentRun.Player.CurrentHP
+        );
 
         Debug.Log(
             "Player HP Loaded : " +
@@ -168,32 +636,46 @@ public class BattleManager : MonoBehaviour
 
         if (runManager == null)
         {
-            Debug.LogError("BattleManager : RunManager not found");
+            Debug.LogError(
+                "BattleManager : RunManager not found"
+            );
+
             return;
         }
 
         if (runManager.CurrentRun == null)
         {
-            Debug.LogError("BattleManager : CurrentRun is null");
+            Debug.LogError(
+                "BattleManager : CurrentRun is null"
+            );
+
             return;
         }
 
         if (runManager.CurrentRun.Player == null)
         {
-            Debug.LogError("BattleManager : PlayerRunData is null");
+            Debug.LogError(
+                "BattleManager : PlayerRunData is null"
+            );
+
             return;
         }
 
         if (player == null)
         {
-            Debug.LogError("BattleManager : PlayerData is null");
+            Debug.LogError(
+                "BattleManager : PlayerData is null"
+            );
+
             return;
         }
 
         int currentHP =
             player.GetCurrentHP();
 
-        runManager.CurrentRun.Player.SetCurrentHP(currentHP);
+        runManager.CurrentRun.Player.SetCurrentHP(
+            currentHP
+        );
 
         Debug.Log(
             "Player HP Saved : " +
@@ -201,160 +683,5 @@ public class BattleManager : MonoBehaviour
             " / " +
             runManager.CurrentRun.Player.MaxHP
         );
-    }
-
-    public void SelectCard(CardData card)
-    {
-        if (currentState != BattleState.PlayerTurn)
-        {
-            return;
-        }
-
-        selectedCard = card;
-    }
-
-    public void PlaySelectedCard()
-    {
-        Debug.Log("PlaySelectedCard Called");
-
-        if (currentState != BattleState.PlayerTurn)
-        {
-            return;
-        }
-    
-        if (selectedCard == null)
-        {
-            return;
-        }
-
-        if (!deckManager.CanPlayCard(selectedCard))
-        {
-            Debug.Log("CARD NOT IN HAND");
-            return;
-        }
-
-        int cost = selectedCard.EnergyCost;
-        
-        //ถ้าทำสิ่งนี้ไม่สำเร็จให้หยุดทันที
-        if (!player.TryUseEnergy(cost))
-        {
-            Debug.Log("NOT HAVE ENEGY");
-            return;
-        }
-        
-        cardEffectManager.Resolve(selectedCard, player, enemy);
-        deckManager.PlayCard(selectedCard);
-
-        //test
-        Debug.Log("Card Effect Resolved");
-        Debug.Log("Energy : "+ player.CurrentEnergy);
-        //
-
-        ProcessBattleEnd();
-
-        //RefreshUI();
-    }
-
-    private void EndPlayerTurn()
-    {
-        currentState = BattleState.EnemyTurn;
-
-        Debug.Log("Player Turn Ended");
-
-        StartEnemyTurn();
-    }
-    
-    /////Enemy/////
-
-    private void StartEnemyTurn()
-    {
-        SetupEnemyTurn();
-
-        currentState = BattleState.EnemyTurn;
-
-        Debug.Log("Enemy Turn Started");
-
-        enemyManager.PerformTurn();
-
-        ProcessBattleEnd();
-
-        if (currentState == BattleState.End)
-        {
-            return;
-        }
-
-        PrepareEnemyIntent();
-
-        EndEnemyTurn();
-    }
-
-    private void SetupEnemyTurn()
-    {
-        enemy.ResetBlock();
-    }
-
-    private void PrepareEnemyIntent()
-    {
-        enemy.DecideAction();
-
-        enemyIntentDisplayManager.ShowIntent(enemy.CurrentAction);
-    }
-
-    private void EndEnemyTurn()
-    {
-        currentState = BattleState.PlayerTurn;
-
-        Debug.Log("Enemy Turn Ended");
-
-        StartPlayerTurn();
-    }
-
-    /////Battle Result/////
-
-    /// // TODO: Refactor when battle result has more outcomes
-    private void ProcessBattleEnd()
-    {
-        if (player.IsDead())
-        {
-            HandlePlayerLose();
-            return;
-        }
-
-        if (enemy.IsDead())
-        {
-            HandlePlayerWin();
-            return;
-        }
-    }
-
-    private void HandlePlayerWin()
-    {
-        Debug.Log("Player Win");
-    
-        SavePlayerRunData();
-    
-        RunManager runManager =
-            FindFirstObjectByType<RunManager>();
-    
-        if (runManager == null)
-        {
-            Debug.LogError("RunManager not found");
-            return;
-        }
-    
-        runManager.GoToReward();
-    }
-
-    private void HandlePlayerLose()
-    {
-        Debug.Log("Player Loses!");
-        EndBattle();
-    }
-
-    private void EndBattle()
-    {
-        currentState = BattleState.End;
-
-        Debug.Log("Battle Ended");
     }
 }

@@ -6,17 +6,25 @@ public class CardDisplayManager : MonoBehaviour
     [SerializeField] private Card cardPrefab;
     [SerializeField] private Transform handArea;
 
-    // private void Start()
-    //     {
-    //         RefreshHand();
-    //     }
-
     public void RefreshHand()
     {
+        if (deckManager == null)
+        {
+            Debug.LogError("CardDisplayManager : DeckManager is null");
+            return;
+        }
 
-        //Debug.Log("Refresh Hand");
+        if (cardPrefab == null)
+        {
+            Debug.LogError("CardDisplayManager : Card Prefab is null");
+            return;
+        }
 
-        //Debug.Log("Hand Count : " + deckManager.Hand.Count);
+        if (handArea == null)
+        {
+            Debug.LogError("CardDisplayManager : Hand Area is null");
+            return;
+        }
 
         foreach (Transform child in handArea)
         {
@@ -25,12 +33,9 @@ public class CardDisplayManager : MonoBehaviour
 
         foreach (CardData cardData in deckManager.Hand)
         {
-            //Debug.Log("Loop : " + cardData.CardName);
-
             Card card = Instantiate(cardPrefab, handArea);
 
             card.SetCardData(cardData);
         }
-
     }
 }

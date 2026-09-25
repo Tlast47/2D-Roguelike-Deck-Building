@@ -1,11 +1,20 @@
+using System.Collections.Generic;
+
 public class CardEffectContext
 {
-    public PlayerData Player;
-    public EnemyData Enemy;
+    public PlayerData Player { get; }
 
-    public CardEffectContext(PlayerData player, EnemyData enemy)
+    public IReadOnlyList<EnemyData> Enemies { get; }
+
+    public EnemyData SelectedEnemy { get; }
+
+    public CardEffectContext(
+        PlayerData player,
+        IReadOnlyList<EnemyData> enemies,
+        EnemyData selectedEnemy)
     {
         Player = player;
-        Enemy = enemy;
+        Enemies = enemies;
+        SelectedEnemy = selectedEnemy;
     }
 }

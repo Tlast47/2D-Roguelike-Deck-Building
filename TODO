@@ -1,6 +1,5 @@
 more effects
 more pattern enemy AI 
-ืnode rest
-start node
 node ติดกัน 
-ืnode shop อย่างน้อย 1/map
+node shop rest อย่างน้อย 1/map
+more card:targetห

@@ -1,5 +1,7 @@
 public enum TargetType
 {
     Player,
-    Enemy
+    SingleEnemy,
+    AllEnemies,
+    RandomEnemy
 }

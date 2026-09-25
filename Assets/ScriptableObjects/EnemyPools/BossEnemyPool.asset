@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3a72758f0be443b4894fc6827ec7a2a8, type: 3}
-  m_Name: DefendBlock
-  m_EditorClassIdentifier: Assembly-CSharp::BlockEffect
-  targetType: 0
-  blockAmount: 50
+  m_Script: {fileID: 11500000, guid: 8b432b126dfd0a34389b26da410b9662, type: 3}
+  m_Name: BossEnemyPool
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyPool
+  enemyPrefabs:
+  - {fileID: 7680470398080880475, guid: 578e69bdc4901f84cb8fb719dfabf7b3, type: 3}

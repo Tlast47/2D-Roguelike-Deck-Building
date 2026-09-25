@@ -206,6 +206,23 @@ public class DeckManager : MonoBehaviour
         discardPile.Add(card);
     }
 
+    public void DiscardHand()
+    {
+        if (hand.Count == 0)
+        {
+            return;
+        }
+    
+        discardPile.AddRange(hand);
+        hand.Clear();
+    
+        Debug.Log(
+            "All cards in hand discarded. " +
+            "Discard Count : " +
+            discardPile.Count
+        );
+    }
+
 
     public IReadOnlyList<CardData> Hand => hand;
 }
