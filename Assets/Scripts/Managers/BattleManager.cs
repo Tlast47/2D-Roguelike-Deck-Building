@@ -14,7 +14,9 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private EnemyManager enemyManager;
     [SerializeField] private BattleEncounterManager battleEncounterManager;
     [SerializeField] private BattleTargetManager battleTargetManager;
-    [SerializeField] private EnemyTargetDisplayManager enemyTargetDisplayManager;
+    
+    [Header("UI")]
+    [SerializeField] private PlayerStatusUI playerStatusUI;
 
     [Header("Battle State")]
     [SerializeField] private CardData selectedCard;
@@ -71,6 +73,8 @@ public class BattleManager : MonoBehaviour
 
         LoadPlayerRunData();
 
+        RefreshBattleUI();
+
         if (!ValidateManagers())
         {
             return;
@@ -99,10 +103,6 @@ public class BattleManager : MonoBehaviour
 
         deckManager.StartBattleSetup();
         cardDisplayManager.RefreshHand();
-
-        enemyTargetDisplayManager.RefreshTargets(
-            enemyManager.Enemies
-        );
 
         PrepareEnemyActions();
 
@@ -174,16 +174,29 @@ public class BattleManager : MonoBehaviour
             return false;
         }
 
-        if (enemyTargetDisplayManager == null)
+        return true;
+    }
+
+    private void RefreshBattleUI()
+    {
+        if (playerStatusUI == null)
         {
             Debug.LogError(
-                "BattleManager : EnemyTargetDisplayManager is null"
+                "BattleManager : PlayerStatusUI is NULL"
             );
 
-            return false;
+            return;
         }
 
-        return true;
+        if (player == null)
+        {
+            Debug.LogError(
+                "BattleManager : PlayerData is NULL"
+            );
+
+            return;
+        }
+        playerStatusUI.Refresh();
     }
 
     ///// Player Turn /////
@@ -200,7 +213,7 @@ public class BattleManager : MonoBehaviour
 
         battleTargetManager.ClearTarget();
 
-        enemyTargetDisplayManager.SetTargetSelectionEnabled(false);
+        RefreshBattleUI();
 
         Debug.Log("Player Turn Started");
     }
@@ -217,8 +230,6 @@ public class BattleManager : MonoBehaviour
     {
         player.ResetEnergy();
         player.ResetBlock();
-
-        enemyManager.ResetEnemyBlocks();
     }
 
     private void SetupCards()
@@ -233,9 +244,6 @@ public class BattleManager : MonoBehaviour
 
     private void SetupUI()
     {
-        enemyTargetDisplayManager.RefreshTargets(
-            enemyManager.Enemies
-        );
     }
 
     ///// Player Card /////
@@ -262,8 +270,6 @@ public class BattleManager : MonoBehaviour
         {
             battleTargetManager.BeginTargetSelection();
             
-            enemyTargetDisplayManager.SetTargetSelectionEnabled(true);
-
             Debug.Log(
                 "BattleManager : Waiting for Enemy Target"
             );
@@ -272,8 +278,6 @@ public class BattleManager : MonoBehaviour
         }
 
         battleTargetManager.EndTargetSelection();
-
-        enemyTargetDisplayManager.SetTargetSelectionEnabled(false);
 
         PlaySelectedCard();
     }
@@ -345,10 +349,6 @@ public class BattleManager : MonoBehaviour
             {
                 battleTargetManager.ClearTarget();
 
-                enemyTargetDisplayManager.RefreshTargets(
-                    enemyManager.Enemies
-                );
-
                 return;
             }
         }
@@ -372,6 +372,10 @@ public class BattleManager : MonoBehaviour
             targetEnemy
         );
 
+        enemyManager.RefreshEnemyUI();
+
+        RefreshBattleUI();
+
         deckManager.PlayCard(selectedCard);
 
         Debug.Log(
@@ -383,8 +387,6 @@ public class BattleManager : MonoBehaviour
 
         battleTargetManager.ClearTarget();
 
-        enemyTargetDisplayManager.SetTargetSelectionEnabled(false);
-
         cardDisplayManager.RefreshHand();
 
         ProcessBattleEnd();
@@ -393,10 +395,6 @@ public class BattleManager : MonoBehaviour
         {
             return;
         }
-
-        enemyTargetDisplayManager.RefreshTargets(
-            enemyManager.Enemies
-        );
     }
 
     ///// Player Turn End /////
@@ -413,8 +411,6 @@ public class BattleManager : MonoBehaviour
         battleTargetManager.EndTargetSelection();
 
         battleTargetManager.ClearTarget();
-
-        enemyTargetDisplayManager.SetTargetSelectionEnabled(false);
 
         deckManager.DiscardHand();
 
@@ -435,6 +431,8 @@ public class BattleManager : MonoBehaviour
 
         Debug.Log("Enemy Turn Started");
 
+        enemyManager.ResetEnemyBlocks();
+
         enemyManager.PerformTurn();
 
         ProcessBattleEnd();
@@ -445,6 +443,7 @@ public class BattleManager : MonoBehaviour
         }
 
         PrepareEnemyActions();
+        RefreshBattleUI();
 
         EndEnemyTurn();
     }
@@ -470,29 +469,29 @@ public class BattleManager : MonoBehaviour
             battleTargetManager.OnEnemySelected -= HandleEnemySelected;
         }
     }
-    
+
     private void HandleEnemySelected(EnemyData enemy)
     {
         if (enemy == null)
         {
             return;
         }
-    
+
         if (currentState != BattleState.PlayerTurn)
         {
             return;
         }
-    
+
         if (selectedCard == null)
         {
             return;
         }
-    
+
         Debug.Log(
             "BattleManager : Enemy Target Received : " +
             enemy.name
         );
-    
+
         PlaySelectedCard();
     }
 

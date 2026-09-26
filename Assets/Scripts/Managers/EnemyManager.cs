@@ -93,6 +93,16 @@ public class EnemyManager : MonoBehaviour
                 " Action Decided : " +
                 enemy.CurrentAction?.ActionType
             );
+
+            EnemyIntentDisplayManager intentDisplay =
+                enemy.GetComponent<EnemyIntentDisplayManager>();
+
+            if (intentDisplay != null)
+            {
+                intentDisplay.ShowIntent(
+                    enemy.CurrentAction
+                );
+            }
         }
     }
 
@@ -238,4 +248,54 @@ public class EnemyManager : MonoBehaviour
                 break;
         }
     }
+
+    public void RefreshEnemyUI()
+    {
+        if (enemies == null)
+        {
+            return;
+        }
+
+        foreach (EnemyData enemy in enemies)
+        {
+            if (enemy == null)
+            {
+                continue;
+            }
+
+            EnemyStatusUI enemyStatusUI =
+                enemy.GetComponentInChildren<EnemyStatusUI>();
+
+            if (enemyStatusUI == null)
+            {
+                continue;
+            }
+
+            enemyStatusUI.Refresh();
+        }
+    }
+
+    public void RemoveDeadEnemies()
+    {
+        for (int i = enemies.Count - 1; i >= 0; i--)
+        {
+            EnemyData enemy = enemies[i];
+    
+            if (enemy == null)
+            {
+                enemies.RemoveAt(i);
+                continue;
+            }
+    
+            if (!enemy.IsDead())
+            {
+                continue;
+            }
+    
+            enemy.gameObject.SetActive(false);
+    
+            enemies.RemoveAt(i);
+        }
+    }
+
 }

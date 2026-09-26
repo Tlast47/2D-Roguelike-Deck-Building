@@ -3,11 +3,12 @@ using UnityEngine;
 
 public class EnemyTargetDisplayManager : MonoBehaviour
 {
+    [Header("Enemy Target")]
     [SerializeField] private EnemyTargetUI enemyTargetPrefab;
-    [SerializeField] private Transform targetArea;
+    [SerializeField] private Transform[] targetSlots;
     [SerializeField] private BattleTargetManager battleTargetManager;
 
-    private List<EnemyTargetUI> targetButtons =
+    private readonly List<EnemyTargetUI> targetUIs =
         new List<EnemyTargetUI>();
 
     public void RefreshTargets(
@@ -17,63 +18,69 @@ public class EnemyTargetDisplayManager : MonoBehaviour
 
         if (enemies == null)
         {
-            Debug.LogWarning(
-                "EnemyTargetDisplayManager : Enemy list is null"
-            );
-
             return;
         }
 
-        foreach (EnemyData enemy in enemies)
+        for (int i = 0; i < enemies.Count; i++)
         {
+            if (i >= targetSlots.Length)
+            {
+                Debug.LogError(
+                    "EnemyTargetDisplayManager : " +
+                    "Not enough target slots"
+                );
+
+                break;
+            }
+
+            EnemyData enemy = enemies[i];
+
             if (enemy == null)
             {
                 continue;
             }
 
-            if (enemy.IsDead())
-            {
-                continue;
-            }
-
-            if (enemyTargetPrefab == null)
-            {
-                Debug.LogError(
-                    "EnemyTargetDisplayManager : Enemy Target Prefab is null"
-                );
-
-                return;
-            }
-
-            if (targetArea == null)
-            {
-                Debug.LogError(
-                    "EnemyTargetDisplayManager : Target Area is null"
-                );
-
-                return;
-            }
-
             EnemyTargetUI targetUI =
                 Instantiate(
                     enemyTargetPrefab,
-                    targetArea
+                    targetSlots[i]
                 );
+
+            targetUI.transform.localPosition =
+                Vector3.zero;
+
+            targetUI.transform.localRotation =
+                Quaternion.identity;
+
+            targetUI.transform.localScale =
+                Vector3.one;
 
             targetUI.Setup(
                 enemy,
                 battleTargetManager
             );
 
-            targetButtons.Add(targetUI);
+            targetUIs.Add(targetUI);
         }
-
-        SetTargetSelectionEnabled(false);
     }
 
-    public void SetTargetSelectionEnabled(bool enabled)
+    public void RefreshEnemyUI()
     {
-        foreach (EnemyTargetUI targetUI in targetButtons)
+        foreach (EnemyTargetUI targetUI in targetUIs)
+        {
+            if (targetUI == null)
+            {
+                continue;
+            }
+
+            targetUI.RefreshUI();
+        }
+    }
+
+    public void SetTargetSelectionEnabled(
+        bool enabled)
+    {
+        foreach (EnemyTargetUI targetUI in targetUIs)
         {
             if (targetUI == null)
             {
@@ -84,18 +91,37 @@ public class EnemyTargetDisplayManager : MonoBehaviour
         }
     }
 
+    public void RemoveDeadEnemies()
+    {
+        foreach (EnemyTargetUI targetUI in targetUIs)
+        {
+            if (targetUI == null)
+            {
+                continue;
+            }
+
+            if (targetUI.Enemy == null)
+            {
+                continue;
+            }
+
+            if (targetUI.Enemy.IsDead())
+            {
+                targetUI.SetVisible(false);
+            }
+        }
+    }
+
     private void ClearTargets()
     {
-        targetButtons.Clear();
-
-        if (targetArea == null)
+        foreach (EnemyTargetUI targetUI in targetUIs)
         {
-            return;
+            if (targetUI != null)
+            {
+                Destroy(targetUI.gameObject);
+            }
         }
 
-        foreach (Transform child in targetArea)
-        {
-            Destroy(child.gameObject);
-        }
+        targetUIs.Clear();
     }
 }

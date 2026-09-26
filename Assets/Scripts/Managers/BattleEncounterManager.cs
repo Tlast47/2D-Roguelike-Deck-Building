@@ -248,9 +248,41 @@ public class BattleEncounterManager : MonoBehaviour
         GameObject enemyObject =
             Instantiate(
                 enemyPrefab,
-                spawnPoint.position,
-                spawnPoint.rotation
+                spawnPoint.parent
             );
+        
+        RectTransform enemyRect =
+            enemyObject.GetComponent<RectTransform>();
+        
+        RectTransform spawnRect =
+            spawnPoint.GetComponent<RectTransform>();
+        
+        if (enemyRect != null && spawnRect != null)
+        {
+            enemyRect.anchorMin = spawnRect.anchorMin;
+            enemyRect.anchorMax = spawnRect.anchorMax;
+            enemyRect.pivot = spawnRect.pivot;
+        
+            enemyRect.anchoredPosition =
+                spawnRect.anchoredPosition;
+        
+            enemyRect.localRotation =
+                Quaternion.identity;
+        
+            enemyRect.localScale =
+                Vector3.one;
+        }
+        else
+        {
+            enemyObject.transform.localPosition =
+                spawnPoint.localPosition;
+        
+            enemyObject.transform.localRotation =
+                Quaternion.identity;
+        
+            enemyObject.transform.localScale =
+                Vector3.one;
+        }
 
         EnemyData enemyData =
             enemyObject.GetComponent<EnemyData>();
@@ -265,6 +297,21 @@ public class BattleEncounterManager : MonoBehaviour
             Destroy(enemyObject);
 
             return null;
+        }
+
+        EnemyStatusUI enemyStatusUI =
+            enemyObject.GetComponentInChildren<EnemyStatusUI>();
+
+        if (enemyStatusUI != null)
+        {
+            enemyStatusUI.SetEnemy(enemyData);
+        }
+        else
+        {
+            Debug.LogWarning(
+                "BattleEncounterManager : EnemyStatusUI not found on " +
+                enemyObject.name
+            );
         }
 
         Debug.Log(

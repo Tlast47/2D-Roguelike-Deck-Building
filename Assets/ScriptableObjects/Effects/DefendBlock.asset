@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: DefendBlock
   m_EditorClassIdentifier: Assembly-CSharp::BlockEffect
   targetType: 0
-  blockAmount: 50
+  blockAmount: 5
