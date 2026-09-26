@@ -248,7 +248,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 533545918}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8b1cc34ff8c070c4fa07ab23591d1720, type: 3}
+  m_Script: {fileID: 11500000, guid: a291e2a9a17f2c541bbad481d1b7467c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapGenerator
 --- !u!4 &533545920
@@ -346,6 +346,7 @@ MonoBehaviour:
   mapLayerPrefab: {fileID: 7747074321768051239, guid: 8522d8b9584be5046bb3ad4cb7e22c96, type: 3}
   connectionLayer: {fileID: 1776150996}
   mapConnectionPrefab: {fileID: 6294057944246240236, guid: 012a9183e6e95394da244795de92be91, type: 3}
+  mapScrollRect: {fileID: 0}
 --- !u!4 &994743766
 Transform:
   m_ObjectHideFlags: 0

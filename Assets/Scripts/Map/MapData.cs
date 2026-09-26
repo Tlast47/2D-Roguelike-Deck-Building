@@ -2,18 +2,29 @@ using System.Collections.Generic;
 
 public class MapData
 {
-    public IReadOnlyList<MapNode> Nodes => nodes;
+    //// Map Data ////
 
-    private List<MapNode> nodes;
+    public IReadOnlyList<MapNode> Nodes =>
+        nodes;
 
     public MapNode StartNode { get; private set; }
 
+    //// Internal Data ////
+
+    private List<MapNode> nodes;
+
+    //// Constructor ////
+
     public MapData()
     {
-        nodes = new List<MapNode>();
+        nodes =
+            new List<MapNode>();
     }
 
-    public void AddNode(MapNode node)
+    //// Node Management ////
+
+    public void AddNode(
+        MapNode node)
     {
         if (node == null)
         {
@@ -28,7 +39,10 @@ public class MapData
         nodes.Add(node);
     }
 
-    public void SetStartNode(MapNode node)
+    //// Start Node ////
+
+    public void SetStartNode(
+        MapNode node)
     {
         StartNode = node;
     }
