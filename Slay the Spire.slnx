@@ -1,3 +1,19 @@
 ﻿<Solution>
+  <Project Path="Unity.InputSystem.csproj" />
+  <Project Path="UnityEngine.UI.Tests.csproj" />
+  <Project Path="UnityEngine.UI.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="Unity.TextMeshPro.Editor.csproj" />
+  <Project Path="Unity.InternalAPIEngineBridge.004.csproj" />
+  <Project Path="UnityEditor.UI.csproj" />
+  <Project Path="Unity.TextMeshPro.csproj" />
+  <Project Path="UnityEditor.UI.EditorTests.csproj" />
+  <Project Path="Unity.InputSystem.DocCodeSamples.csproj" />
+  <Project Path="Unity.InputSystem.ForUI.csproj" />
+  <Project Path="UnityEditor.UI.Analytics.csproj" />
+  <Project Path="Unity.InputSystem.TestFramework.csproj" />
+  <Project Path="Unity.TextMeshPro.Tests.csproj" />
+  <Project Path="Unity.TextMeshPro.Editor.Tests.csproj" />
+  <Project Path="UnityEditor.UI.Common.Tests.csproj" />
+  <Project Path="Unity.InputSystem.IntegrationTests.csproj" />
 </Solution>

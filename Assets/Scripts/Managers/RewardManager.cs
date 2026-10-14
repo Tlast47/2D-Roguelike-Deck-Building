@@ -107,8 +107,14 @@ public class RewardManager : MonoBehaviour
         currentCardRewards =
             new List<CardData>();
 
-        List<CardData> availableCards =
-            new List<CardData>(rewardCardPool);
+        List<CardData> availableCards = new List<CardData>();
+        foreach (CardData card in rewardCardPool)
+        {
+            if (card != null && card.AvailableInCardPools && !availableCards.Contains(card))
+            {
+                availableCards.Add(card);
+            }
+        }
 
         int rewardCount =
             Mathf.Min(

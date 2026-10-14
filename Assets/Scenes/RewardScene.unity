@@ -157,8 +157,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.00012207031, y: 0.0009765625}
-  m_SizeDelta: {x: -0.00024414, y: 0.0019531}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &49199287
 MonoBehaviour:
@@ -173,8 +173,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
-  m_RaycastTarget: 1
+  m_Color: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 1}
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -232,10 +232,10 @@ RectTransform:
   - {fileID: 1717204880}
   m_Father: {fileID: 1543836935}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -761, y: -445}
-  m_SizeDelta: {x: 160, y: 30}
+  m_AnchorMin: {x: 0.5, y: 0.09}
+  m_AnchorMax: {x: 0.5, y: 0.09}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 220, y: 52}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &196257201
 MonoBehaviour:
@@ -435,6 +435,7 @@ GameObject:
   - component: {fileID: 705433345}
   - component: {fileID: 705433344}
   - component: {fileID: 705433343}
+  - component: {fileID: 890000001}
   m_Layer: 5
   m_Name: CardRewardContainer
   m_TagString: Untagged
@@ -456,8 +457,8 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 49199286}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.1, y: 0.2}
+  m_AnchorMax: {x: 0.9, y: 0.7}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -468,7 +469,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 705433341}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
   m_Name: 
@@ -500,8 +501,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
-  m_RaycastTarget: 1
+  m_Color: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 1}
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -557,10 +558,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 49199286}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 247, y: 343}
-  m_SizeDelta: {x: 315, y: 70}
+  m_AnchorMin: {x: 0.52, y: 0.73}
+  m_AnchorMax: {x: 0.74, y: 0.81}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1316356650
 MonoBehaviour:
@@ -609,12 +610,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 28
+  m_fontSizeBase: 28
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 28
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
@@ -628,7 +629,7 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
@@ -713,9 +714,9 @@ MonoBehaviour:
   m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 1920, y: 1080}
-  m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_ReferenceResolution: {x: 1600, y: 900}
+  m_ScreenMatchMode: 1
+  m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -798,10 +799,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 49199286}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -70.40996, y: 343.00006}
-  m_SizeDelta: {x: 315, y: 70}
+  m_AnchorMin: {x: 0.26, y: 0.73}
+  m_AnchorMax: {x: 0.52, y: 0.81}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1544584104
 MonoBehaviour:
@@ -850,12 +851,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 28
+  m_fontSizeBase: 28
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 28
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -869,7 +870,7 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
@@ -990,9 +991,9 @@ MonoBehaviour:
   m_fontSize: 24
   m_fontSizeBase: 24
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 24
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -1006,7 +1007,7 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
@@ -1072,10 +1073,18 @@ MonoBehaviour:
   goldReward: 20
   goldRewardText: {fileID: 1316356650}
   rewardCardPool:
-  - {fileID: 11400000, guid: 123cc5bdd2b51814a84e20e1dabffc86, type: 2}
-  - {fileID: 11400000, guid: c2450137ed0a66b4d93d514d3c58aee6, type: 2}
-  - {fileID: 11400000, guid: 1fce8215a5070e048b33d648fdf6d6b8, type: 2}
-  - {fileID: 11400000, guid: e7ce1a68cb851934dad228c98f190b46, type: 2}
+  - {fileID: 11400000, guid: e10d21db98164284a08e1d44e52cd880, type: 2}
+  - {fileID: 11400000, guid: 54d95e1a62744a75919136314447d3f7, type: 2}
+  - {fileID: 11400000, guid: 7115d7daca80405a8a14ce8d2b25e10e, type: 2}
+  - {fileID: 11400000, guid: 92a61a6e0d334fcbaecca29cdca83fff, type: 2}
+  - {fileID: 11400000, guid: d6566887f39e449cb85db43919c8ee7e, type: 2}
+  - {fileID: 11400000, guid: 69295e6798b74331a456ceb858066a3a, type: 2}
+  - {fileID: 11400000, guid: 25129acb13b247348be969834328abf1, type: 2}
+  - {fileID: 11400000, guid: 4c5ff379a3b649e081deb01cdb679637, type: 2}
+  - {fileID: 11400000, guid: c31b3e2197a04bb6acb6b13e10ac3470, type: 2}
+  - {fileID: 11400000, guid: 8e100f8ccaf242c19707059b2f124a02, type: 2}
+  - {fileID: 11400000, guid: b9b1233c9c3144e19b445fd0eff48109, type: 2}
+  - {fileID: 11400000, guid: ac760394c1fd4d6f81e5cec1e411d158, type: 2}
   rewardCardCount: 3
   rewardCardPrefab: {fileID: 2660783932519662802, guid: 28d99a4d0224af14eb37de2761d72d97, type: 3}
   cardRewardContainer: {fileID: 705433342}
@@ -1205,10 +1214,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 49199286}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 87.09108, y: 434.49005}
-  m_SizeDelta: {x: 634.822, y: 83.015625}
+  m_AnchorMin: {x: 0.15, y: 0.83}
+  m_AnchorMax: {x: 0.85, y: 0.93}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1983321727
 MonoBehaviour:
@@ -1257,12 +1266,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 55
-  m_fontSizeBase: 55
+  m_fontSize: 48
+  m_fontSizeBase: 48
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 48
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -1276,7 +1285,7 @@ MonoBehaviour:
   m_charWidthMaxAdj: 0
   m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
@@ -1318,3 +1327,19 @@ SceneRoots:
   - {fileID: 1773603900}
   - {fileID: 1543836935}
   - {fileID: 1822067826}
+--- !u!114 &890000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 705433341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 806d5b05fc94466b9b67b8ac593eac81, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::ResponsiveCardRow
+  cardSize: {x: 220, y: 330}
+  spacing: 20
+
+

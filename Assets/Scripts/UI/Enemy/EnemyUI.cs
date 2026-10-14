@@ -107,6 +107,8 @@ public class EnemyUI : MonoBehaviour
                 enemy.GetMaxHP();
         }
 
+        CharacterStatusDisplay.Refresh(enemy, hpText, blockText, intentTypeText, intentValueText);
+
         // Enemy ตาย
         if (enemy.IsDead())
         {
@@ -129,12 +131,6 @@ public class EnemyUI : MonoBehaviour
         }
 
         // Enemy ยังมีชีวิต
-        if (blockText != null)
-        {
-            blockText.text =
-                "Block: " +
-                enemy.GetBlock();
-        }
 
         EnemyAction action =
             enemy.CurrentAction;

@@ -32,6 +32,7 @@ public class EnemyManager : MonoBehaviour
                 continue;
             }
 
+            enemy.ClearStatusEffects();
             enemies.Add(enemy);
         }
 
@@ -170,6 +171,9 @@ public class EnemyManager : MonoBehaviour
                 continue;
             }
 
+            enemy.ProcessPoison();
+            if (enemy.IsDead()) continue;
+
             EnemyAction action =
                 enemy.CurrentAction;
 
@@ -177,6 +181,9 @@ public class EnemyManager : MonoBehaviour
                 enemy,
                 action
             );
+
+            enemy.ProcessBurn();
+            if (player.IsDead()) break;
         }
     }
 

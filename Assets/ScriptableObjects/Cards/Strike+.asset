@@ -16,6 +16,7 @@ MonoBehaviour:
   description: Deal 9 damage.
   cardType: 0
   rarity: 0
+  availableInCardPools: 0
   energyCost: 1
   effects:
   - {fileID: 11400000, guid: c3a4de37f1611e44ca6efdcbfdda4e77, type: 2}

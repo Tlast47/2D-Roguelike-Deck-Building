@@ -80,6 +80,8 @@ public class BattleManager : MonoBehaviour
             return;
         }
 
+        player.ClearStatusEffects();
+
         List<EnemyData> spawnedEnemies =
             battleEncounterManager.SpawnEnemies();
 
@@ -203,6 +205,11 @@ public class BattleManager : MonoBehaviour
 
     private void StartPlayerTurn()
     {
+        player.ProcessPoison();
+        ProcessBattleEnd();
+        RefreshBattleUI();
+        if (currentState == BattleState.End) return;
+
         SetupPlayerTurn();
 
         currentState = BattleState.PlayerTurn;
@@ -412,6 +419,11 @@ public class BattleManager : MonoBehaviour
 
         battleTargetManager.ClearTarget();
 
+        player.ProcessBurn();
+        RefreshBattleUI();
+        ProcessBattleEnd();
+        if (currentState == BattleState.End) return;
+
         deckManager.DiscardHand();
 
         cardDisplayManager.RefreshHand();
@@ -434,6 +446,7 @@ public class BattleManager : MonoBehaviour
         enemyManager.ResetEnemyBlocks();
 
         enemyManager.PerformTurn();
+        enemyManager.RefreshEnemyUI();
 
         ProcessBattleEnd();
 
@@ -540,6 +553,8 @@ public class BattleManager : MonoBehaviour
     private void HandlePlayerWin()
     {
         Debug.Log("Player Win");
+        currentState = BattleState.End;
+        player.ClearStatusEffects();
 
         SavePlayerRunData();
 
@@ -566,6 +581,7 @@ public class BattleManager : MonoBehaviour
     {
         currentState = BattleState.End;
 
+        player.ClearStatusEffects();
         Debug.Log("Battle Ended");
     }
 

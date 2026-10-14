@@ -5,7 +5,6 @@ public class EnemyTargetDisplayManager : MonoBehaviour
 {
     [Header("Enemy Target")]
     [SerializeField] private EnemyTargetUI enemyTargetPrefab;
-    [SerializeField] private Transform[] targetSlots;
     [SerializeField] private BattleTargetManager battleTargetManager;
 
     private readonly List<EnemyTargetUI> targetUIs =
@@ -23,16 +22,6 @@ public class EnemyTargetDisplayManager : MonoBehaviour
 
         for (int i = 0; i < enemies.Count; i++)
         {
-            if (i >= targetSlots.Length)
-            {
-                Debug.LogError(
-                    "EnemyTargetDisplayManager : " +
-                    "Not enough target slots"
-                );
-
-                break;
-            }
-
             EnemyData enemy = enemies[i];
 
             if (enemy == null)
@@ -43,7 +32,7 @@ public class EnemyTargetDisplayManager : MonoBehaviour
             EnemyTargetUI targetUI =
                 Instantiate(
                     enemyTargetPrefab,
-                    targetSlots[i]
+                    enemy.transform
                 );
 
             targetUI.transform.localPosition =
@@ -54,6 +43,15 @@ public class EnemyTargetDisplayManager : MonoBehaviour
 
             targetUI.transform.localScale =
                 Vector3.one;
+
+            // Overlay the real enemy so resizing never separates its clickable target.
+            RectTransform targetRect = targetUI.transform as RectTransform;
+            if (targetRect != null)
+            {
+                targetRect.anchorMin = Vector2.zero;
+                targetRect.anchorMax = Vector2.one;
+                targetRect.offsetMin = targetRect.offsetMax = Vector2.zero;
+            }
 
             targetUI.Setup(
                 enemy,
@@ -125,3 +123,4 @@ public class EnemyTargetDisplayManager : MonoBehaviour
         targetUIs.Clear();
     }
 }
+

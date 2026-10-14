@@ -11,6 +11,7 @@ public class CardData : ScriptableObject
 
     [SerializeField] private CardType cardType;
     [SerializeField] private CardRarity rarity;
+    [SerializeField] private bool availableInCardPools = true;
 
     [Header("Card Stats")]
     [SerializeField] private int energyCost;
@@ -27,6 +28,7 @@ public class CardData : ScriptableObject
     
     public CardType CardType => cardType;
     public CardRarity Rarity => rarity;
+    public bool AvailableInCardPools => availableInCardPools;
     
     public int EnergyCost => energyCost;
 

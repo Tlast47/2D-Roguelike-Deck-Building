@@ -16,6 +16,7 @@ MonoBehaviour:
   description: Gain 8 Block.
   cardType: 1
   rarity: 0
+  availableInCardPools: 0
   energyCost: 1
   effects:
   - {fileID: 11400000, guid: 2cb2a50b9edd9fe44a91983a094967b8, type: 2}

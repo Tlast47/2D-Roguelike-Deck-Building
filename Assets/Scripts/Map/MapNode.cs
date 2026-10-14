@@ -1,10 +1,11 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 public class MapNode
 {
     //// Node Data ////
 
-    public MapNodeType NodeType { get; }
+    public MapNodeType NodeType { get; private set; }
 
     public int LayerIndex { get; }
 
@@ -49,6 +50,18 @@ public class MapNode
 
         connections.Add(node);
     }
+
+    // Generated once per run, so visiting scenes does not reshuffle room positions.
+    public Vector2 LayoutPosition { get; private set; }
+    public bool HasLayoutPosition { get; private set; }
+
+    public void SetLayoutPosition(Vector2 position)
+    {
+        LayoutPosition = position;
+        HasLayoutPosition = true;
+    }
+
+    internal void SetNodeType(MapNodeType type) { NodeType = type; }
 
     //// Node State ////
 

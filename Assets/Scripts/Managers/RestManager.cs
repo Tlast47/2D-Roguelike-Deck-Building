@@ -221,6 +221,7 @@ public class RestManager : MonoBehaviour
     {
         for (int i = cardContainer.childCount - 1; i >= 0; i--)
         {
+            cardContainer.GetChild(i).gameObject.SetActive(false);
             Destroy(cardContainer.GetChild(i).gameObject);
         }
     }

@@ -34,12 +34,7 @@ public class EnemyStatusUI : MonoBehaviour
                 enemy.GetMaxHP();
         }
 
-        if (blockText != null)
-        {
-            blockText.text =
-                "Block: " +
-                enemy.GetBlock();
-        }
+        CharacterStatusDisplay.Refresh(enemy, hpText, blockText, intentText);
 
         if (intentText != null)
         {

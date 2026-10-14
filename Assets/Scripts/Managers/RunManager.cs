@@ -14,6 +14,7 @@ public class RunManager : MonoBehaviour
     [Header("Starter Deck")]
     [SerializeField] private CardData strikeCard;
     [SerializeField] private CardData defendCard;
+    [SerializeField] private CardData heavySlashCard;
 
     private static RunManager instance;
 
@@ -72,7 +73,11 @@ public class RunManager : MonoBehaviour
 
         CurrentRun.AddGold(100);
 
-        InitializeStarterDeck();
+        if (!InitializeStarterDeck())
+        {
+            CurrentRun = null;
+            return;
+        }
 
         Debug.Log("New Run Started");
         Debug.Log("Starting Gold : " + CurrentRun.Gold);
@@ -126,27 +131,37 @@ public class RunManager : MonoBehaviour
         }
     }
 
-    private void InitializeStarterDeck()
+    private bool InitializeStarterDeck()
     {
-        if (strikeCard == null || defendCard == null)
+        // Existing loaded scenes can have an empty newly added Inspector field.
+        // Resolve missing references from a build-safe default asset.
+        StarterDeckDefinition defaults = Resources.Load<StarterDeckDefinition>("StarterDeck");
+        if (defaults != null)
         {
-            Debug.LogError("Starter Deck CardData is missing");
-            return;
+            if (strikeCard == null) strikeCard = defaults.StrikeCard;
+            if (heavySlashCard == null) heavySlashCard = defaults.HeavySlashCard;
+            if (defendCard == null) defendCard = defaults.DefendCard;
+        }
+        if (strikeCard == null || heavySlashCard == null || defendCard == null)
+        {
+            Debug.LogError("Starter Deck CardData is missing: check Assets/Resources/StarterDeck.asset.");
+            return false;
         }
 
-        for (int i = 0; i < 5; i++)
+        // The same ten-card deck is used for every new run.
+        for (int i = 0; i < 4; i++)
         {
             CurrentRun.Deck.AddCard(strikeCard);
         }
-
+        CurrentRun.Deck.AddCard(heavySlashCard);
         for (int i = 0; i < 5; i++)
         {
             CurrentRun.Deck.AddCard(defendCard);
         }
 
         Debug.Log("Starter Deck Initialized : " + CurrentRun.Deck.Count + " cards");
+        return true;
     }
-    
     public void AddGold(int amount)
     {
         if (CurrentRun == null)

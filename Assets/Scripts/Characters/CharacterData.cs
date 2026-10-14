@@ -9,6 +9,51 @@ public class CharacterData : MonoBehaviour
     [SerializeField] protected int currentHP = 80;
     [SerializeField] protected int block = 0;
 
+    // Combat-only stacks; never stored in prefabs or run data.
+    private int burnStacks;
+    private int poisonStacks;
+
+    public int BurnStacks => burnStacks;
+    public int PoisonStacks => poisonStacks;
+
+    public void AddBurn(int amount)
+    {
+        if (amount <= 0 || IsDead()) return;
+        burnStacks = (int)System.Math.Min((long)burnStacks + amount, int.MaxValue);
+    }
+
+    public void AddPoison(int amount)
+    {
+        if (amount <= 0 || IsDead()) return;
+        poisonStacks = (int)System.Math.Min((long)poisonStacks + amount, int.MaxValue);
+    }
+
+    // Poison triggers at the start of the owner's turn and bypasses Block.
+    public void ProcessPoison()
+    {
+        if (IsDead() || poisonStacks <= 0) return;
+        int damage = poisonStacks;
+        poisonStacks--;
+        currentHP = Mathf.Max(0, currentHP - damage);
+        Debug.Log(name + " Poison damage: " + damage);
+    }
+
+    // Burn triggers at the end of the owner's turn and can be blocked.
+    public void ProcessBurn()
+    {
+        if (IsDead() || burnStacks <= 0) return;
+        int damage = burnStacks;
+        burnStacks--;
+        TakeDamage(damage);
+        Debug.Log(name + " Burn damage: " + damage);
+    }
+
+    public void ClearStatusEffects()
+    {
+        burnStacks = 0;
+        poisonStacks = 0;
+    }
+
     /////Combat Methods/////
 
     public void TakeDamage(int damage)

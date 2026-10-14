@@ -1,9 +1,15 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ShopManager : MonoBehaviour
 {
     [Header("Shop Cards")]
     [SerializeField] private CardData[] shopCards;
+    [Min(1)]
+    [SerializeField] private int shopCardCount = 3;
+
+    private readonly List<CardData> currentStock = new List<CardData>();
+    private readonly HashSet<CardData> purchasedCards = new HashSet<CardData>();
 
     [Header("Card Prices")]
     [SerializeField] private int cardPrice = 50;
@@ -49,7 +55,9 @@ public class ShopManager : MonoBehaviour
         if (runManager.CurrentRun == null)
             return false;
 
-        return runManager.CurrentRun.Gold >= cardPrice;
+        return currentStock.Contains(card) &&
+               !purchasedCards.Contains(card) &&
+               runManager.CurrentRun.Gold >= cardPrice;
     }
 
 
@@ -63,9 +71,17 @@ public class ShopManager : MonoBehaviour
             return false;
         }
 
-        runManager.CurrentRun.SpendGold(cardPrice);
+        if (!runManager.CurrentRun.SpendGold(cardPrice))
+            return false;
+
+        purchasedCards.Add(card);
 
         runManager.CurrentRun.Deck.AddCard(card);
+
+        foreach (ShopCardUI cardUI in shopCardContainer.GetComponentsInChildren<ShopCardUI>())
+        {
+            cardUI.RefreshBuyButton();
+        }
 
         Debug.Log(
             "Card Purchased : " +
@@ -107,7 +123,26 @@ public class ShopManager : MonoBehaviour
             return;
         }
 
+        currentStock.Clear();
+        purchasedCards.Clear();
+        List<CardData> availableCards = new List<CardData>();
         foreach (CardData card in shopCards)
+        {
+            if (card != null && card.AvailableInCardPools && !availableCards.Contains(card))
+            {
+                availableCards.Add(card);
+            }
+        }
+
+        int stockCount = Mathf.Min(Mathf.Max(1, shopCardCount), availableCards.Count);
+        for (int i = 0; i < stockCount; i++)
+        {
+            int index = Random.Range(0, availableCards.Count);
+            currentStock.Add(availableCards[index]);
+            availableCards.RemoveAt(index);
+        }
+
+        foreach (CardData card in currentStock)
         {
             if (card == null)
                 continue;
@@ -130,7 +165,7 @@ public class ShopManager : MonoBehaviour
             cardUI.Setup(card, cardPrice, this);
         }
 
-        Debug.Log("Shop Built : " + shopCards.Length + " cards");
+        Debug.Log("Shop Built : " + currentStock.Count + " cards");
     }
 
     public void LeaveShop()

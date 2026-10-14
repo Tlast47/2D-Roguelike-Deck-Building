@@ -16,6 +16,11 @@ public class PlayerStatusUI : MonoBehaviour
         Refresh();
     }
 
+    private void LateUpdate()
+    {
+        if (player != null) Refresh();
+    }
+
     public void Refresh()
     {
         if (player == null)
@@ -36,12 +41,7 @@ public class PlayerStatusUI : MonoBehaviour
                 player.GetMaxHP();
         }
 
-        if (blockText != null)
-        {
-            blockText.text =
-                "Block: " +
-                player.GetBlock();
-        }
+        CharacterStatusDisplay.Refresh(player, hpText, blockText, energyText);
 
         if (energyText != null)
         {

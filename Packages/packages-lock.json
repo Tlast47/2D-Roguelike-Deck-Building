@@ -177,13 +177,12 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.inputsystem": {
-      "version": "1.19.0",
+      "version": "file:com.unity.inputsystem",
       "depth": 0,
-      "source": "registry",
+      "source": "embedded",
       "dependencies": {
         "com.unity.modules.uielements": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
+      }
     },
     "com.unity.mathematics": {
       "version": "1.4.0",
@@ -239,9 +238,9 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ugui": {
-      "version": "2.5.0",
+      "version": "file:com.unity.ugui",
       "depth": 0,
-      "source": "builtin",
+      "source": "embedded",
       "dependencies": {
         "com.unity.modules.ui": "1.0.0",
         "com.unity.modules.imgui": "1.0.0",

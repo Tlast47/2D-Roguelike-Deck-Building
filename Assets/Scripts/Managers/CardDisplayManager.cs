@@ -28,6 +28,7 @@ public class CardDisplayManager : MonoBehaviour
 
         foreach (Transform child in handArea)
         {
+            child.gameObject.SetActive(false);
             Destroy(child.gameObject);
         }
 

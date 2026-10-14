@@ -16,6 +16,7 @@ MonoBehaviour:
   description: Gain 5 Block.
   cardType: 1
   rarity: 0
+  availableInCardPools: 0
   energyCost: 1
   effects:
   - {fileID: 11400000, guid: 3c049a72ce0bf9a4dae440996e5dffff, type: 2}
