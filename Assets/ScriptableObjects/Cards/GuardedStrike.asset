@@ -16,8 +16,11 @@ MonoBehaviour:
   description: "Deal 5 damage. Gain 4 Block."
   cardType: 0
   rarity: 0
+  baseShopPrice: 55
+  isUpgraded: 0
   energyCost: 1
   effects:
   - {fileID: 11400000, guid: 7c74a164f2ed46f1a4a19116840cae43, type: 2}
   - {fileID: 11400000, guid: 8d715af1edf44ff1b0b7b8fe49910c56, type: 2}
   upgradedCard: {fileID: 11400000, guid: c35899e91e524f9fbf7207a71e4bc3d5, type: 2}
+

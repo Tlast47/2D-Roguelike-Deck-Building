@@ -27,6 +27,13 @@ public class PlayerDeck
         return cards.Remove(card);
     }
 
+    public bool RemoveCardAt(int index)
+    {
+        if (index < 0 || index >= cards.Count || cards.Count <= 1) return false;
+        cards.RemoveAt(index);
+        return true;
+    }
+
     public bool HasCard(CardData card)
     {
         if (card == null) return false;

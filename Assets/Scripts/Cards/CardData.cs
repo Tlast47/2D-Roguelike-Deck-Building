@@ -13,6 +13,12 @@ public class CardData : ScriptableObject
     [SerializeField] private CardRarity rarity;
     [SerializeField] private bool availableInCardPools = true;
 
+    [Header("Shop")]
+    [Min(0)] [SerializeField] private int baseShopPrice;
+    [SerializeField] private bool isUpgraded;
+    public int BaseShopPrice => baseShopPrice;
+    public bool IsUpgraded => isUpgraded;
+
     [Header("Card Stats")]
     [SerializeField] private int energyCost;
     
@@ -37,3 +43,4 @@ public class CardData : ScriptableObject
     public CardData UpgradedCard => upgradedCard;
 
 }
+

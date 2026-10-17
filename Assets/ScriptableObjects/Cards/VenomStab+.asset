@@ -16,8 +16,11 @@ MonoBehaviour:
   description: "Deal 6 damage. Apply 4 Poison."
   cardType: 0
   rarity: 0
+  baseShopPrice: 80
+  isUpgraded: 1
   energyCost: 1
   effects:
   - {fileID: 11400000, guid: 0cdf3c2f4a242f34886b4e2c0448a231, type: 2}
   - {fileID: 11400000, guid: 3a8efd795f4346ea8d46108b4b27ebb7, type: 2}
   upgradedCard: {fileID: 0}
+

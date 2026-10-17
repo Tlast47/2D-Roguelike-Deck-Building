@@ -124,7 +124,10 @@ public class Card : MonoBehaviour
 
         if (energyCostText != null)
         {
-            energyCostText.text = cardData.EnergyCost.ToString();
+            energyCostText.text = "Energy: " + cardData.EnergyCost;
         }
+        CardVisualStyle.Apply((RectTransform)transform, cardData, cardNameText, descriptionText,
+            energyCostText, "Energy: " + cardData.EnergyCost, background: CardVisualStyle.LightBackground);
     }
 }
+

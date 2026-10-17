@@ -16,7 +16,10 @@ MonoBehaviour:
   description: "Gain 3 Block."
   cardType: 1
   rarity: 0
+  baseShopPrice: 35
+  isUpgraded: 0
   energyCost: 0
   effects:
   - {fileID: 11400000, guid: 8fbcd2a524f240ee9681dc547347554a, type: 2}
   upgradedCard: {fileID: 11400000, guid: e15e517678174d8faaded15456264b53, type: 2}
+

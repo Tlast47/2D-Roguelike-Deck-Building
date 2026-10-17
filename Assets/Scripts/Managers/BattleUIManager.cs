@@ -33,6 +33,15 @@ public class BattleUIManager : MonoBehaviour
         endTurnButton.onClick.AddListener(OnEndTurnClicked);
     }
 
+    private void Start()
+    {
+        Canvas canvas = endTurnButton != null ? endTurnButton.GetComponentInParent<Canvas>() : null;
+        DeckManager deck = FindFirstObjectByType<DeckManager>();
+        if (canvas == null || deck == null) return;
+        BattlePileUI piles = gameObject.AddComponent<BattlePileUI>();
+        piles.Setup(deck, canvas.rootCanvas.transform as RectTransform);
+    }
+
     private void OnDestroy()
     {
         if (endTurnButton != null)

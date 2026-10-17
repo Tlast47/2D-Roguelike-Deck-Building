@@ -16,7 +16,10 @@ MonoBehaviour:
   description: "Apply 7 Poison."
   cardType: 1
   rarity: 2
+  baseShopPrice: 115
+  isUpgraded: 0
   energyCost: 2
   effects:
   - {fileID: 11400000, guid: cf9bbd05484b4d78ba832f9fa275594d, type: 2}
   upgradedCard: {fileID: 11400000, guid: 3bde6c9199e3493cb4551c44cb16a0f6, type: 2}
+

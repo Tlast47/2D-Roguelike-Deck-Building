@@ -16,8 +16,11 @@ MonoBehaviour:
   description: "Gain 7 Block. Apply 3 Burn to ALL enemies."
   cardType: 1
   rarity: 1
+  baseShopPrice: 90
+  isUpgraded: 0
   energyCost: 2
   effects:
   - {fileID: 11400000, guid: 2150ecd5bd214367812f4f4782c14c6c, type: 2}
   - {fileID: 11400000, guid: 4fcb2268a53945b1b2426672da42ca5e, type: 2}
   upgradedCard: {fileID: 11400000, guid: ce5aa84333e942adb9d6264c45c071aa, type: 2}
+

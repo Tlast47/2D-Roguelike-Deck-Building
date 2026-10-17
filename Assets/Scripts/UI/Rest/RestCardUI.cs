@@ -35,6 +35,7 @@ public class RestCardUI : MonoBehaviour
             descriptionText.text = card.Description;
         }
 
+        CardVisualStyle.Apply((RectTransform)transform, card, cardNameText, descriptionText, action: selectButton);
         if (selectButton != null)
         {
             selectButton.onClick.RemoveAllListeners();

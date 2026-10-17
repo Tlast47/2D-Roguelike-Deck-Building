@@ -16,8 +16,11 @@ MonoBehaviour:
   description: "Deal 5 damage. Apply 2 Burn."
   cardType: 0
   rarity: 0
+  baseShopPrice: 50
+  isUpgraded: 0
   energyCost: 1
   effects:
   - {fileID: 11400000, guid: 7c74a164f2ed46f1a4a19116840cae43, type: 2}
   - {fileID: 11400000, guid: 7ea7a60fc69042e98ad21a22a94b5420, type: 2}
   upgradedCard: {fileID: 11400000, guid: 746e3e8e95d54c53aa35831ecdf22d76, type: 2}
+

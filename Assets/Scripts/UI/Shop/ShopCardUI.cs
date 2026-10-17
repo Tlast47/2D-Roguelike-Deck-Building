@@ -25,13 +25,16 @@ public class ShopCardUI : MonoBehaviour
         }
 
         if (cardNameText != null)
+        {
             cardNameText.text = cardData.CardName;
+            cardNameText.color = cardData.IsUpgraded ? new Color(1f, 0.86f, 0.42f) : Color.white;
+        }
 
         if (descriptionText != null)
             descriptionText.text = cardData.Description;
 
         if (priceText != null)
-            priceText.text = price.ToString();
+            priceText.text = price + " Gold";
 
         if (buyButton != null)
         {
@@ -39,6 +42,8 @@ public class ShopCardUI : MonoBehaviour
             buyButton.onClick.AddListener(OnBuyButtonClicked);
         }
 
+        CardVisualStyle.Apply((RectTransform)transform, cardData, cardNameText, descriptionText,
+            priceText, price + " Gold", buyButton, background: CardVisualStyle.LightBackground);
         RefreshBuyButton();
     }
 
@@ -55,6 +60,8 @@ public class ShopCardUI : MonoBehaviour
         }
 
         buyButton.interactable = shopManager.CanBuyCard(cardData);
+        TMP_Text buttonLabel = buyButton.GetComponentInChildren<TMP_Text>();
+        if (buttonLabel != null) buttonLabel.text = shopManager.IsCardSold(cardData) ? "SOLD" : "BUY";
     }
 
 
@@ -71,3 +78,5 @@ public class ShopCardUI : MonoBehaviour
         }
     }
 }
+
+

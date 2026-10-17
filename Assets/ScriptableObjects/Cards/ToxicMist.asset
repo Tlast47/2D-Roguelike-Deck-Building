@@ -16,7 +16,10 @@ MonoBehaviour:
   description: "Apply 3 Poison to ALL enemies."
   cardType: 1
   rarity: 1
+  baseShopPrice: 80
+  isUpgraded: 0
   energyCost: 2
   effects:
   - {fileID: 11400000, guid: 4e85cea6a4f14ee7b70f717e5db7323c, type: 2}
   upgradedCard: {fileID: 11400000, guid: 767f28cd6dd84986b1c4489feb299727, type: 2}
+

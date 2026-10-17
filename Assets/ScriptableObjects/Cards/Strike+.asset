@@ -17,7 +17,10 @@ MonoBehaviour:
   cardType: 0
   rarity: 0
   availableInCardPools: 0
+  baseShopPrice: 55
+  isUpgraded: 1
   energyCost: 1
   effects:
   - {fileID: 11400000, guid: c3a4de37f1611e44ca6efdcbfdda4e77, type: 2}
   upgradedCard: {fileID: 0}
+

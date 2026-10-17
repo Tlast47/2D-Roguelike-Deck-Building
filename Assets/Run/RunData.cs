@@ -1,6 +1,17 @@
+using System.Collections.Generic;
+
 public class RunData
 {
     public int Gold { get; private set; }
+    public RelicCollection Relics { get; private set; }
+    public int CardsRemoved { get; private set; }
+    private readonly Dictionary<MapNode, ShopInventory> shops = new Dictionary<MapNode, ShopInventory>();
+    private readonly Dictionary<MapNode, BattleRewardData> rewards = new Dictionary<MapNode, BattleRewardData>();
+    public ShopInventory GetShop(MapNode node) => node != null && shops.TryGetValue(node, out var shop) ? shop : null;
+    public void SetShop(MapNode node, ShopInventory shop) { if (node != null) shops[node] = shop; }
+    public BattleRewardData GetReward(MapNode node) => node != null && rewards.TryGetValue(node, out var reward) ? reward : null;
+    public void SetReward(MapNode node, BattleRewardData reward) { if (node != null) rewards[node] = reward; }
+    public void RecordCardRemoval() { CardsRemoved++; }
 
     public MapNode CurrentNode { get; private set; }
 
@@ -23,6 +34,7 @@ public class RunData
 
         Deck = new PlayerDeck();
         Player = new PlayerRunData();
+        Relics = new RelicCollection(Player);
     }
 
 

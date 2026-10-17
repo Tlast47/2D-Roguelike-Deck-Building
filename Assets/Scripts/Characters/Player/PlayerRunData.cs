@@ -11,6 +11,13 @@ public class PlayerRunData
         CurrentHP = MaxHP;
     }
 
+    public void IncreaseMaxHP(int amount)
+    {
+        if (amount <= 0) return;
+        MaxHP += amount;
+        Heal(amount);
+    }
+
     public void SetCurrentHP(int hp)
     {
         CurrentHP = Mathf.Clamp(hp, 0, MaxHP);

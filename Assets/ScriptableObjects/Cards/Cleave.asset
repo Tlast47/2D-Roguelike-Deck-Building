@@ -16,7 +16,10 @@ MonoBehaviour:
   description: "Deal 5 damage to ALL enemies."
   cardType: 0
   rarity: 0
+  baseShopPrice: 50
+  isUpgraded: 0
   energyCost: 1
   effects:
   - {fileID: 11400000, guid: 3f521b608dff46c08a292b7d0317f1fe, type: 2}
   upgradedCard: {fileID: 11400000, guid: 2a6c3fc0c15d43ed982fb83d959cd25f, type: 2}
+

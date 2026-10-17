@@ -16,8 +16,11 @@ MonoBehaviour:
   description: "Deal 8 damage to ALL enemies. Apply 3 Burn to ALL enemies."
   cardType: 0
   rarity: 1
+  baseShopPrice: 110
+  isUpgraded: 1
   energyCost: 2
   effects:
   - {fileID: 11400000, guid: afc2f79e39ad485f9785b352298d2616, type: 2}
   - {fileID: 11400000, guid: 4fcb2268a53945b1b2426672da42ca5e, type: 2}
   upgradedCard: {fileID: 0}
+

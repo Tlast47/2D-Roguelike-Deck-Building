@@ -16,7 +16,10 @@ MonoBehaviour:
   description: "Deal 14 damage."
   cardType: 0
   rarity: 0
+  baseShopPrice: 45
+  isUpgraded: 0
   energyCost: 2
   effects:
   - {fileID: 11400000, guid: b00dab9e2e0745ed9ac5ed7bf2e8a2f2, type: 2}
   upgradedCard: {fileID: 11400000, guid: ac71e0a1b0e341518cc4277bc4a99535, type: 2}
+

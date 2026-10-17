@@ -5,186 +5,148 @@ public class ShopManager : MonoBehaviour
 {
     [Header("Shop Cards")]
     [SerializeField] private CardData[] shopCards;
-    [Min(1)]
-    [SerializeField] private int shopCardCount = 3;
-
-    private readonly List<CardData> currentStock = new List<CardData>();
-    private readonly HashSet<CardData> purchasedCards = new HashSet<CardData>();
-
-    [Header("Card Prices")]
-    [SerializeField] private int cardPrice = 50;
-
+    [Min(2)] [SerializeField] private int shopCardCount = 3;
     [Header("Shop UI")]
     [SerializeField] private GameObject shopCardPrefab;
     [SerializeField] private Transform shopCardContainer;
-
     private RunManager runManager;
+    private ShopInventory inventory;
+    private ShopEconomyUI economyUI;
+    private RunData Run => runManager != null ? runManager.CurrentRun : null;
+    public IReadOnlyList<ShopRelicOffer> RelicOffers => inventory.Relics.AsReadOnly();
+    public int RemovalPrice => EconomyBalance.RemovalBasePrice + (Run?.CardsRemoved ?? 0) * EconomyBalance.RemovalPriceIncrease;
+    public bool RemovalUsed => inventory != null && inventory.RemovalUsed;
+    public PlayerDeck Deck => Run?.Deck;
+    public int Gold => Run?.Gold ?? 0;
 
     private void Start()
     {
         runManager = FindFirstObjectByType<RunManager>();
-
-        if (runManager == null)
+        if (Run == null || shopCardPrefab == null || shopCardContainer == null)
         {
-            Debug.LogError("ShopManager : RunManager not found");
+            Debug.LogError("ShopManager: run or shop UI references are missing.");
             return;
         }
-
-        if (runManager.CurrentRun == null)
+        inventory = Run.GetShop(Run.CurrentNode);
+        if (inventory == null)
         {
-            Debug.LogError("ShopManager : CurrentRun is null");
-            return;
+            inventory = CreateStock();
+            Run.SetShop(Run.CurrentNode, inventory);
         }
-
-        Debug.Log("ShopManager Ready");
-        Debug.Log("Player Gold : " + runManager.CurrentRun.Gold);
-
-        BuildShop();
-        //TestBuyCard();
+        BuildCards();
+        economyUI = gameObject.AddComponent<ShopEconomyUI>();
+        economyUI.Setup(this, shopCardContainer as RectTransform);
     }
 
+    private ShopInventory CreateStock()
+    {
+        ShopInventory stock = new ShopInventory();
+        List<CardData> families = new List<CardData>();
+        if (shopCards != null)
+            foreach (CardData card in shopCards)
+                if (card != null && card.AvailableInCardPools && !card.IsUpgraded && !families.Contains(card))
+                    families.Add(card);
+        int count = Mathf.Min(Mathf.Max(2, shopCardCount), families.Count);
+        HashSet<int> prices = new HashSet<int>();
+        for (int i = 0; i < count; i++)
+        {
+            // Reserve an upgraded family for slot two so every normal shop has both variants.
+            bool upgraded = i == 1 || (i > 1 && Random.value < 0.25f);
+            List<CardData> choices = families.FindAll(c => !upgraded ||
+                (c.UpgradedCard != null && c.UpgradedCard.AvailableInCardPools));
+            if (choices.Count == 0) { upgraded = false; choices.AddRange(families); }
+            if (i == 0 && count > 1 && families.Exists(c => c.UpgradedCard != null && c.UpgradedCard.AvailableInCardPools))
+            {
+                List<CardData> safe = choices.FindAll(c => families.Exists(other => other != c &&
+                    other.UpgradedCard != null && other.UpgradedCard.AvailableInCardPools));
+                if (safe.Count > 0) choices = safe;
+            }
+            CardData family = choices[Random.Range(0, choices.Count)];
+            families.Remove(family);
+            CardData selected = upgraded ? family.UpgradedCard : family;
+            int price = EconomyBalance.CardPrice(selected);
+            while (!prices.Add(price)) price += 5;
+            stock.Cards.Add(new ShopCardOffer { Card = selected, Price = price });
+        }
+        List<RelicData> relics = RelicCatalog.Available(Run.Relics);
+        for (int i = 0; i < EconomyBalance.RelicsPerShop && relics.Count > 0; i++)
+        {
+            int index = Random.Range(0, relics.Count);
+            RelicData relic = relics[index];
+            stock.Relics.Add(new ShopRelicOffer { Relic = relic, Price = relic.ShopPrice });
+            relics.RemoveAt(index);
+        }
+        return stock;
+    }
 
+    private void BuildCards()
+    {
+        foreach (Transform child in shopCardContainer)
+        {
+            child.gameObject.SetActive(false);
+            Destroy(child.gameObject);
+        }
+        foreach (ShopCardOffer offer in inventory.Cards)
+        {
+            ShopCardUI view = Instantiate(shopCardPrefab, shopCardContainer).GetComponent<ShopCardUI>();
+            if (view != null) view.Setup(offer.Card, offer.Price, this);
+        }
+    }
+
+    private ShopCardOffer FindCard(CardData card) => inventory?.Cards.Find(offer => offer.Card == card);
+    public bool IsCardSold(CardData card) => FindCard(card)?.Sold ?? false;
     public bool CanBuyCard(CardData card)
     {
-        if (card == null)
-            return false;
-
-        if (runManager == null)
-            return false;
-
-        if (runManager.CurrentRun == null)
-            return false;
-
-        return currentStock.Contains(card) &&
-               !purchasedCards.Contains(card) &&
-               runManager.CurrentRun.Gold >= cardPrice;
+        ShopCardOffer offer = FindCard(card);
+        return Run != null && offer != null && !offer.Sold && Run.Gold >= offer.Price;
     }
-
 
     public bool BuyCard(CardData card)
     {
-        if (!CanBuyCard(card))
-        {
-            Debug.Log("Cannot Buy Card : " + 
-                (card != null ? card.CardName : "NULL"));
-
-            return false;
-        }
-
-        if (!runManager.CurrentRun.SpendGold(cardPrice))
-            return false;
-
-        purchasedCards.Add(card);
-
-        runManager.CurrentRun.Deck.AddCard(card);
-
-        foreach (ShopCardUI cardUI in shopCardContainer.GetComponentsInChildren<ShopCardUI>())
-        {
-            cardUI.RefreshBuyButton();
-        }
-
-        Debug.Log(
-            "Card Purchased : " +
-            card.CardName +
-            " | Price : " +
-            cardPrice
-        );
-
-        Debug.Log(
-            "Player Deck Count : " +
-            runManager.CurrentRun.Deck.Count
-        );
-
-        Debug.Log(
-            "Player Gold : " +
-            runManager.CurrentRun.Gold
-        );
-
+        if (!CanBuyCard(card)) return false;
+        ShopCardOffer offer = FindCard(card);
+        if (!Run.SpendGold(offer.Price)) return false;
+        offer.Sold = true;
+        Run.Deck.AddCard(card);
+        RefreshShop();
         return true;
     }
 
-    private void BuildShop()
+    public bool CanBuyRelic(ShopRelicOffer offer)
     {
-        if (shopCardPrefab == null)
-        {
-            Debug.LogError("ShopManager : Shop Card Prefab is missing");
-            return;
-        }
-
-        if (shopCardContainer == null)
-        {
-            Debug.LogError("ShopManager : Shop Card Container is missing");
-            return;
-        }
-
-        if (shopCards == null || shopCards.Length == 0)
-        {
-            Debug.LogWarning("ShopManager : No shop cards assigned");
-            return;
-        }
-
-        currentStock.Clear();
-        purchasedCards.Clear();
-        List<CardData> availableCards = new List<CardData>();
-        foreach (CardData card in shopCards)
-        {
-            if (card != null && card.AvailableInCardPools && !availableCards.Contains(card))
-            {
-                availableCards.Add(card);
-            }
-        }
-
-        int stockCount = Mathf.Min(Mathf.Max(1, shopCardCount), availableCards.Count);
-        for (int i = 0; i < stockCount; i++)
-        {
-            int index = Random.Range(0, availableCards.Count);
-            currentStock.Add(availableCards[index]);
-            availableCards.RemoveAt(index);
-        }
-
-        foreach (CardData card in currentStock)
-        {
-            if (card == null)
-                continue;
-
-            GameObject cardObject =
-                Instantiate(shopCardPrefab, shopCardContainer);
-
-            ShopCardUI cardUI =
-                cardObject.GetComponent<ShopCardUI>();
-
-            if (cardUI == null)
-            {
-                Debug.LogError(
-                    "ShopManager : Shop Card Prefab does not have ShopCardUI"
-                );
-
-                continue;
-            }
-
-            cardUI.Setup(card, cardPrice, this);
-        }
-
-        Debug.Log("Shop Built : " + currentStock.Count + " cards");
+        return Run != null && offer != null && inventory.Relics.Contains(offer) && !offer.Sold &&
+            offer.Relic != null && !Run.Relics.Contains(offer.Relic) && Run.Gold >= offer.Price;
     }
 
-    public void LeaveShop()
+    public bool BuyRelic(ShopRelicOffer offer)
     {
-        if (runManager == null)
-            return;
-    
-        runManager.ReturnToMap();
+        if (!CanBuyRelic(offer) || !Run.SpendGold(offer.Price)) return false;
+        if (!Run.Relics.TryAdd(offer.Relic)) { Run.AddGold(offer.Price); return false; }
+        offer.Sold = true;
+        RefreshShop();
+        return true;
     }
 
-    private void TestBuyCard()
-    {
-        if (shopCards == null || shopCards.Length == 0)
-        {
-            Debug.LogWarning("ShopManager : No shop cards assigned");
-            return;
-        }
+    public bool CanRemoveCard => Run != null && inventory != null && !inventory.RemovalUsed &&
+        Run.Deck.Count > 1 && Run.Gold >= RemovalPrice;
 
-        BuyCard(shopCards[0]);
+    public bool RemoveCard(int index, CardData expectedCard)
+    {
+        if (!CanRemoveCard || expectedCard == null || Run.Deck.GetCard(index) != expectedCard) return false;
+        int price = RemovalPrice;
+        if (!Run.SpendGold(price)) return false;
+        if (!Run.Deck.RemoveCardAt(index)) { Run.AddGold(price); return false; }
+        inventory.RemovalUsed = true;
+        Run.RecordCardRemoval();
+        RefreshShop();
+        return true;
     }
 
+    private void RefreshShop()
+    {
+        foreach (ShopCardUI view in shopCardContainer.GetComponentsInChildren<ShopCardUI>()) view.RefreshBuyButton();
+        if (economyUI != null) economyUI.Refresh();
+    }
+
+    public void LeaveShop() { if (Run != null) runManager.ReturnToMap(); }
 }

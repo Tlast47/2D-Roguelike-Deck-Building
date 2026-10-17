@@ -79,6 +79,7 @@ public class RunManager : MonoBehaviour
             return;
         }
 
+        RunInventoryHUD.Attach(this);
         Debug.Log("New Run Started");
         Debug.Log("Starting Gold : " + CurrentRun.Gold);
 
@@ -516,6 +517,7 @@ public class RunManager : MonoBehaviour
             );
         }
 
+        RunInventoryHUD.Attach(this);
         if (scene.name != "MapScene")
         {
             return;

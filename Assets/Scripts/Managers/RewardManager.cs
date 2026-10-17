@@ -1,326 +1,140 @@
-using UnityEngine;
-using TMPro;
 using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class RewardManager : MonoBehaviour
 {
-    [Header("Gold Reward")]
-    [SerializeField] private int goldReward = 20;
-
     [Header("Reward UI")]
     [SerializeField] private TMP_Text goldRewardText;
-
     [Header("Card Reward")]
     [SerializeField] private CardData[] rewardCardPool;
     [SerializeField] private int rewardCardCount = 3;
-
     [Header("Card Reward UI")]
     [SerializeField] private GameObject rewardCardPrefab;
     [SerializeField] private Transform cardRewardContainer;
-
     private RunManager runManager;
-    private List<CardData> currentCardRewards;
-    private bool rewardSelected;
+    private BattleRewardData reward;
+    private Button claimRelicButton;
+    private RunData Run => runManager != null ? runManager.CurrentRun : null;
 
     private void Start()
     {
-        rewardSelected = false;
-
-        FindRunManager();
-
-        if (runManager == null)
+        runManager = FindFirstObjectByType<RunManager>();
+        if (Run == null || Run.CurrentNode == null)
         {
+            Debug.LogWarning("RewardManager: start a run and win a battle before opening rewards.");
             return;
         }
-
-        GiveGoldReward();
-        RefreshGoldRewardUI();
-        GenerateCardRewards();
+        MapNodeType type = Run.CurrentNode.NodeType;
+        if (type != MapNodeType.NormalBattle && type != MapNodeType.Elite && type != MapNodeType.Boss) return;
+        reward = Run.GetReward(Run.CurrentNode);
+        if (reward == null)
+        {
+            reward = GenerateReward(type);
+            Run.SetReward(Run.CurrentNode, reward);
+        }
+        if (!reward.GoldClaimed)
+        {
+            reward.GoldClaimed = true;
+            Run.AddGold(reward.Gold);
+        }
+        if (goldRewardText != null) goldRewardText.text = "+" + reward.Gold + " Gold";
         BuildCardRewardUI();
+        BuildRelicRewardUI();
     }
 
-    private void FindRunManager()
+    private BattleRewardData GenerateReward(MapNodeType type)
     {
-        runManager =
-            FindFirstObjectByType<RunManager>();
-
-        if (runManager == null)
+        BattleRewardData result = new BattleRewardData();
+        result.Gold = EconomyBalance.BattleGold(type) + Run.Relics.Total(RelicEffect.VictoryGold);
+        List<CardData> available = new List<CardData>();
+        if (rewardCardPool != null)
+            foreach (CardData card in rewardCardPool)
+                if (card != null && card.AvailableInCardPools && !card.IsUpgraded && !available.Contains(card)) available.Add(card);
+        int count = Mathf.Min(Mathf.Max(0, rewardCardCount), available.Count);
+        for (int i = 0; i < count; i++)
         {
-            Debug.LogError(
-                "RewardManager : RunManager not found"
-            );
-
-            return;
+            int index = Random.Range(0, available.Count);
+            result.Cards.Add(available[index]);
+            available.RemoveAt(index);
         }
-
-        if (runManager.CurrentRun == null)
-        {
-            Debug.LogError(
-                "RewardManager : CurrentRun is null"
-            );
-
-            return;
-        }
-
-        Debug.Log("Reward Scene Started");
+        List<RelicData> relics = RelicCatalog.Available(Run.Relics);
+        float dropChance = EconomyBalance.RelicDropChance(type);
+        if (relics.Count > 0 && (dropChance >= 1f || Random.value < dropChance))
+            result.Relic = relics[Random.Range(0, relics.Count)];
+        return result;
     }
 
-    private void GiveGoldReward()
+    private void BuildCardRewardUI()
     {
-        runManager.CurrentRun.AddGold(goldReward);
-
-        Debug.Log(
-            "Gold Reward : +" +
-            goldReward +
-            " | Current Gold : " +
-            runManager.CurrentRun.Gold
-        );
-    }
-
-    private void RefreshGoldRewardUI()
-    {
-        if (goldRewardText == null)
+        if (rewardCardPrefab == null || cardRewardContainer == null)
         {
-            Debug.LogError(
-                "RewardManager : Gold Reward Text is null"
-            );
-
+            Debug.LogError("RewardManager: card reward prefab/container is missing.");
             return;
         }
-
-        goldRewardText.text =
-            "+" + goldReward + " Gold";
-    }
-
-    private void GenerateCardRewards()
-    {
-        if (rewardCardPool == null ||
-            rewardCardPool.Length == 0)
+        foreach (Transform child in cardRewardContainer)
         {
-            Debug.LogError(
-                "RewardManager : Reward Card Pool is empty"
-            );
-
-            return;
+            child.gameObject.SetActive(false);
+            Destroy(child.gameObject);
         }
-
-        currentCardRewards =
-            new List<CardData>();
-
-        List<CardData> availableCards = new List<CardData>();
-        foreach (CardData card in rewardCardPool)
+        for (int i = 0; i < reward.Cards.Count; i++)
         {
-            if (card != null && card.AvailableInCardPools && !availableCards.Contains(card))
-            {
-                availableCards.Add(card);
-            }
-        }
-
-        int rewardCount =
-            Mathf.Min(
-                rewardCardCount,
-                availableCards.Count
-            );
-
-        for (int i = 0; i < rewardCount; i++)
-        {
-            int randomIndex =
-                Random.Range(
-                    0,
-                    availableCards.Count
-                );
-
-            CardData selectedCard =
-                availableCards[randomIndex];
-
-            currentCardRewards.Add(selectedCard);
-
-            availableCards.RemoveAt(randomIndex);
-        }
-
-        Debug.Log(
-            "Card Rewards Generated : " +
-            currentCardRewards.Count
-        );
-
-        for (int i = 0; i < currentCardRewards.Count; i++)
-        {
-            Debug.Log(
-                "Reward Card " +
-                i +
-                " : " +
-                currentCardRewards[i].CardName
-            );
+            RewardCardUI view = Instantiate(rewardCardPrefab, cardRewardContainer).GetComponent<RewardCardUI>();
+            if (view == null) continue;
+            view.Setup(reward.Cards[i], i, this);
+            view.SetInteractable(!reward.CardClaimed);
         }
     }
 
     public void SelectCardReward(int index)
     {
-        if (rewardSelected)
-        {
-            Debug.LogWarning(
-                "RewardManager : Reward already selected"
-            );
-
-            return;
-        }
-
-        if (currentCardRewards == null)
-        {
-            Debug.LogError(
-                "RewardManager : Card Rewards not generated"
-            );
-
-            return;
-        }
-
-        if (index < 0 ||
-            index >= currentCardRewards.Count)
-        {
-            Debug.LogError(
-                "RewardManager : Invalid Card Reward Index"
-            );
-
-            return;
-        }
-
-        CardData selectedCard =
-            currentCardRewards[index];
-
-        if (selectedCard == null)
-        {
-            Debug.LogError(
-                "RewardManager : Selected Card is null"
-            );
-
-            return;
-        }
-
-        if (runManager == null ||
-            runManager.CurrentRun == null ||
-            runManager.CurrentRun.Deck == null)
-        {
-            Debug.LogError(
-                "RewardManager : Player Deck is not available"
-            );
-
-            return;
-        }
-
-        runManager.CurrentRun.Deck.AddCard(
-            selectedCard
-        );
-
-        rewardSelected = true;
-
-        DisableAllRewardButtons();
-
-        Debug.Log(
-            "Card Reward Selected : " +
-            selectedCard.CardName
-        );
-
-        Debug.Log(
-            "Player Deck Count After Reward : " +
-            runManager.CurrentRun.Deck.Count
-        );
+        if (Run == null || reward == null || reward.CardClaimed || index < 0 || index >= reward.Cards.Count) return;
+        CardData card = reward.Cards[index];
+        if (card == null) return;
+        reward.CardClaimed = true;
+        Run.Deck.AddCard(card);
+        if (cardRewardContainer != null)
+            foreach (RewardCardUI view in cardRewardContainer.GetComponentsInChildren<RewardCardUI>()) view.SetInteractable(false);
     }
 
-    private void BuildCardRewardUI()
+    private void BuildRelicRewardUI()
     {
-        if (rewardCardPrefab == null)
+        Canvas sceneCanvas = cardRewardContainer != null ? cardRewardContainer.GetComponentInParent<Canvas>() : null;
+        if (sceneCanvas == null) return;
+        Transform canvas = sceneCanvas.rootCanvas.transform;
+        if (reward.Relic == null)
         {
-            Debug.LogError(
-                "RewardManager : Reward Card Prefab is null"
-            );
-
+            TMP_Text noRelic = EconomyUI.Label("No Relic Reward", canvas,
+                Run.Relics.Count >= RelicCatalog.Available(null).Count ? "All relics collected." : "No relic found this battle.",
+                0.2f, 0.15f, 0.8f, 0.20f, 20f);
+            noRelic.alignment = TextAlignmentOptions.Center;
             return;
         }
-
-        if (cardRewardContainer == null)
-        {
-            Debug.LogError(
-                "RewardManager : Card Reward Container is null"
-            );
-
-            return;
-        }
-
-        if (currentCardRewards == null)
-        {
-            Debug.LogError(
-                "RewardManager : Current Card Rewards is null"
-            );
-
-            return;
-        }
-
-        for (int i = 0; i < currentCardRewards.Count; i++)
-        {
-            CardData card =
-                currentCardRewards[i];
-
-            GameObject rewardCardObject =
-                Instantiate(
-                    rewardCardPrefab,
-                    cardRewardContainer
-                );
-
-            RewardCardUI rewardCardUI =
-                rewardCardObject.GetComponent<RewardCardUI>();
-
-            if (rewardCardUI == null)
-            {
-                Debug.LogError(
-                    "RewardManager : RewardCardUI not found"
-                );
-
-                continue;
-            }
-
-            rewardCardUI.Setup(
-                card,
-                i,
-                this
-            );
-        }
-
-        Debug.Log(
-            "Card Reward UI Built : " +
-            currentCardRewards.Count +
-            " cards"
-        );
+        EconomyUI.SetRect(cardRewardContainer as RectTransform, 0.10f, 0.34f, 0.90f, 0.72f);
+        RectTransform panel = EconomyUI.Panel("Relic Reward", canvas, 0.20f, 0.15f, 0.80f, 0.30f, EconomyUI.PanelColor);
+        EconomyUI.Label("Name", panel, "RELIC: " + reward.Relic.RelicName, 0.04f, 0.60f, 0.70f, 0.94f, 25f).color =
+            new Color(1f, 0.85f, 0.40f);
+        EconomyUI.Label("Description", panel, reward.Relic.Description, 0.04f, 0.08f, 0.70f, 0.59f, 22f);
+        claimRelicButton = EconomyUI.Button("Claim Relic", panel, "Claim relic", 0.74f, 0.24f, 0.96f, 0.76f, ClaimRelic);
+        RefreshRelicButton();
     }
 
-    private void DisableAllRewardButtons()
+    private void ClaimRelic()
     {
-        if (cardRewardContainer == null)
-        {
-            Debug.LogError(
-                "RewardManager : Card Reward Container is null"
-            );
-
-            return;
-        }
-
-        RewardCardUI[] rewardCards =
-            cardRewardContainer.GetComponentsInChildren<RewardCardUI>();
-
-        for (int i = 0; i < rewardCards.Length; i++)
-        {
-            rewardCards[i].SetInteractable(false);
-        }
-
-        Debug.Log(
-            "RewardManager : All Reward Buttons Disabled"
-        );
+        if (Run == null || reward == null || reward.Relic == null || reward.RelicClaimed) return;
+        if (!Run.Relics.TryAdd(reward.Relic)) return;
+        reward.RelicClaimed = true;
+        RefreshRelicButton();
     }
 
-    public void LeaveReward()
+    private void RefreshRelicButton()
     {
-        if (runManager == null)
-            return;
-    
-        runManager.ReturnToMap();
+        bool owned = Run.Relics.Contains(reward.Relic);
+        claimRelicButton.interactable = !reward.RelicClaimed && !owned;
+        EconomyUI.ButtonText(claimRelicButton, reward.RelicClaimed ? "Collected" : owned ? "Owned" : "Claim relic");
     }
+
+    public void LeaveReward() { if (Run != null) runManager.ReturnToMap(); }
 }
+

@@ -89,6 +89,11 @@ public class DeckManager : MonoBehaviour
     }
 
 
+    public void DrawAdditionalCards(int amount)
+    {
+        if (amount > 0) DrawCards(amount);
+    }
+
     public void StartPlayerTurnDraw()
     {
         int cardsToDraw = GetStartingHandSize() - hand.Count;
@@ -225,4 +230,7 @@ public class DeckManager : MonoBehaviour
 
 
     public IReadOnlyList<CardData> Hand => hand;
+    public IReadOnlyList<CardData> DrawPile => drawPile;
+    public IReadOnlyList<CardData> DiscardPile => discardPile;
 }
+

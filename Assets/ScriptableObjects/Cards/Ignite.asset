@@ -16,7 +16,10 @@ MonoBehaviour:
   description: "Apply 5 Burn."
   cardType: 1
   rarity: 1
+  baseShopPrice: 70
+  isUpgraded: 0
   energyCost: 1
   effects:
   - {fileID: 11400000, guid: 8ba8c5e0e2d84eda9ebff7c250223b94, type: 2}
   upgradedCard: {fileID: 11400000, guid: 37fc761e34824342aebb1acc825aeda9, type: 2}
+

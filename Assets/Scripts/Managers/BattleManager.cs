@@ -22,6 +22,9 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private CardData selectedCard;
 
     private BattleState currentState;
+    private RelicBattleController relicEffects;
+    private RunInventoryHUD inventoryHUD;
+    private BattlePileUI pileUI;
 
     private void Start()
     {
@@ -30,6 +33,10 @@ public class BattleManager : MonoBehaviour
 
     private void Update()
     {
+        if (inventoryHUD == null) inventoryHUD = FindFirstObjectByType<RunInventoryHUD>();
+        if (inventoryHUD != null && inventoryHUD.IsRelicPanelOpen) return;
+        if (pileUI == null) pileUI = FindFirstObjectByType<BattlePileUI>();
+        if (pileUI != null && pileUI.IsOpen) return;
         if (currentState != BattleState.PlayerTurn)
         {
             return;
@@ -104,6 +111,11 @@ public class BattleManager : MonoBehaviour
         );
 
         deckManager.StartBattleSetup();
+        RunManager relicRunManager = FindFirstObjectByType<RunManager>();
+        relicEffects = new RelicBattleController(relicRunManager?.CurrentRun?.Relics,
+            player, deckManager, enemyManager.Enemies);
+        relicEffects.StartBattle();
+        enemyManager.RefreshEnemyUI();
         cardDisplayManager.RefreshHand();
 
         PrepareEnemyActions();
@@ -237,6 +249,7 @@ public class BattleManager : MonoBehaviour
     {
         player.ResetEnergy();
         player.ResetBlock();
+        relicEffects?.StartPlayerTurn();
     }
 
     private void SetupCards()
@@ -512,6 +525,7 @@ public class BattleManager : MonoBehaviour
 
     private void ProcessBattleEnd()
     {
+        if (currentState == BattleState.End) return;
         if (player.IsDead())
         {
             HandlePlayerLose();
@@ -556,6 +570,7 @@ public class BattleManager : MonoBehaviour
         currentState = BattleState.End;
         player.ClearStatusEffects();
 
+        relicEffects?.Victory();
         SavePlayerRunData();
 
         RunManager runManager =
@@ -700,3 +715,5 @@ public class BattleManager : MonoBehaviour
         );
     }
 }
+
+

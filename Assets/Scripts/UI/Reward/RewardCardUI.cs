@@ -42,6 +42,7 @@ public class RewardCardUI : MonoBehaviour
                 cardData.Description;
         }
 
+        CardVisualStyle.Apply((RectTransform)transform, cardData, cardNameText, descriptionText, action: selectButton, background: CardVisualStyle.LightBackground);
         if (selectButton != null)
         {
             selectButton.onClick.RemoveAllListeners();
@@ -78,3 +79,4 @@ public class RewardCardUI : MonoBehaviour
         selectButton.interactable = interactable;
     }
 }
+

@@ -299,7 +299,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b9b1233c9c3144e19b445fd0eff48109, type: 2}
   - {fileID: 11400000, guid: ac760394c1fd4d6f81e5cec1e411d158, type: 2}
   shopCardCount: 3
-  cardPrice: 50
   shopCardPrefab: {fileID: 181237572031748656, guid: 98c400b2608559e44b22d8d82f14b32d, type: 3}
   shopCardContainer: {fileID: 1636292469}
 --- !u!4 &128519887
@@ -850,5 +849,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ResponsiveCardRow
   cardSize: {x: 220, y: 330}
   spacing: 20
+
 
 
